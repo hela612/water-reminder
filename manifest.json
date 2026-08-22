@@ -1,0 +1,17 @@
+{
+  "name": "喝水提醒 Water Reminder",
+  "short_name": "喝水提醒",
+  "description": "水滴涟漪喝水提醒：多风格音乐、弹窗打卡、日历导出、系统通知",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#b3e5fc",
+  "theme_color": "#0288d1",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
