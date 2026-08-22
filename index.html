@@ -125,6 +125,7 @@ h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
 <button class="bs" onclick="stopReminders()">&#x23F8; <span id="l_pause">暂停</span></button>
 <button class="bg2" onclick="resetAll()">&#x21BB; <span id="l_reset">重置</span></button>
 <button class="bg2" onclick="exportICS()">&#x1F4C5; <span id="l_export">导出日历</span></button>
+<button class="bg2" onclick="shareCfg()">&#x1F517; <span id="l_sync">同步</span></button>
 </div>
 <div class="hn" id="healthNote"></div>
 <div class="about">
@@ -149,6 +150,7 @@ h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
 <button id="msB1" onclick="setMusicStyle(1)">&#x2728; 活泼</button>
 <button id="msB2" onclick="setMusicStyle(2)">&#x1F9D8; 冥想</button>
 <button id="msB3" onclick="setMusicStyle(3)">&#x1F30A; 流水</button>
+<button id="msB4" onclick="setMusicStyle(4)">&#x1F3B5; 歌曲</button>
 </div></div>
 <div class="opt-group"><label id="l_calTest">&#x1F4C5; 日历提醒</label>
 <div class="opt-btns">
@@ -227,16 +229,32 @@ function playReminder(preview){
 try{
 stopChime();
 var c=ac(),t0=c.currentTime+.06;
-var master=c.createGain();master.gain.value=.9;master.connect(c.destination);masterNow=master;
+var comp=c.createDynamicsCompressor();comp.threshold.value=-14;comp.knee.value=20;comp.ratio.value=5;comp.attack.value=.003;comp.release.value=.25;comp.connect(c.destination);
+var master=c.createGain();master.gain.value=1.0;master.connect(comp);masterNow=master;
 var st=STYLES[musicStyle]||STYLES[0];
 var flt=c.createBiquadFilter();flt.type='lowpass';flt.frequency.value=st.lp;flt.Q.value=.5;flt.connect(master);
 var dl=c.createDelay();dl.delayTime.value=.31;var fb=c.createGain();fb.gain.value=.28;dl.connect(fb);fb.connect(dl);
 var wet=c.createGain();wet.gain.value=.2;flt.connect(dl);dl.connect(wet);wet.connect(master);
 dropSound(c,flt,t0,.5);
-var total=preview?3.2:10,body=t0+.4;
-while(body<t0+total){st.schedule(c,flt,body);body+=st.len}
+var total=preview?3.2:10;
+if(musicStyle===4){playSong(c,master,t0,total)}
+else{var body=t0+.4;
+while(body<t0+total){st.schedule(c,flt,body);body+=st.len}}
 liveTimers.push(setTimeout(stopChime,preview?3800:10500));
 }catch(e){}}
+var musicBuffer=null,musicLoading=false;
+function getMusicBuffer(c,cb){
+if(musicBuffer){cb(musicBuffer);return}
+if(musicLoading)return;musicLoading=true;
+fetch('music.mp3').then(function(r){return r.arrayBuffer()}).then(function(ab){return c.decodeAudioData(ab)}).then(function(buf){musicBuffer=buf;musicLoading=false;cb(buf)}).catch(function(){musicLoading=false})}
+function playSong(c,master,t0,total){
+getMusicBuffer(c,function(buf){
+if(!masterNow)return;
+var src=c.createBufferSource();src.buffer=buf;src.loop=true;
+var g=c.createGain();g.gain.value=1.0;
+src.connect(g);g.connect(master);
+src.start(t0+.35);src.stop(t0+total+.2);
+liveOsc.push(src)})}
 function notify(){if(method===0)playReminder(false);else if(method===1&&navigator.vibrate)navigator.vibrate([200,100,200,100,300])}
 
 /* PWA: service worker + system notifications */
@@ -261,10 +279,10 @@ else if('Notification' in window){new Notification(title,{body:body,icon:'icon-1
 
 /* i18n */
 var I18N={
-zh:{title:"\uD83D\uDCA7 喝水提醒",sub:"科学补水 · 自主掌控",done:"已喝",goal:"目标",ml:"已喝(ml)",next:"下次提醒",settings:"设置",goalIn:"每日目标（杯）",cupMl:"每杯容量（ml）",start:"开始时间",end:"结束时间",sched:"时间安排",manual:"自定义",auto:"均分",freq:"频率（分钟/次）",redist:"重新分配",manualHint:"点击添加时间点或用均分微调",add:"添加",startBtn:"开始",pause:"暂停",reset:"重置",method:"提醒方式",music:"音乐",vibrate:"震动",silent:"静音",lang:"语言",close:"确定",drinkBtn:"喝了",undo:"撤销",goalDone:"\uD83C\uDF89 今日目标已达成！",reminderOn:"\u2705 提醒已开启",resetMsg:"\u21BB 已重置",timeUp:"\u26A0\uFE0F 到点了！该喝水了",healthHigh:"\u26A0\uFE0F 今日已饮水 {ml} ml，短时间内大量饮水可能导致低钠血症。请根据身体需要适量饮用，不必强求达标。",healthNear:"\uD83D\uDC4D 已接近目标！身体感到口渴再喝即可，不必勉强。",settingsTitle:"\u2699\uFE0F 设置",musicStyle:"音乐风格",ms0:"轻柔",ms1:"活泼",ms2:"冥想",ms3:"流水",about:"来源与许可",aboutMusic:"🎵 音乐：本页面 Web Audio API 实时程序合成（水滴声开场＋多风格旋律），无第三方音频素材，作者：本页面作者 · 来源：内置合成引擎 · 许可证 ",aboutImage:"🖼️ 封面图：水滴入水激起涟漪照片 · 来源：用户提供 · 仅供个人非商业使用",cupOf:"第 {n} / {g} 杯",snoozeBtn:"稍后 10 分钟",exportBtn:"导出日历",icsTitle:"喝水提醒 第 {n} / {g} 杯",icsDesc:"到点了，喝一杯 {ml} ml 的水",exported:"📅 已导出 water-reminder.ics，请在日历 App 中导入使用",calTest:"日历提醒",testIcs:"测试提醒（2分钟后）",testExported:"已导出测试事件（2分钟后触发）。导入日历后留意系统通知，可验证提醒链路",calNote:"💡 日历提醒的声音/震动请在手机系统设置的「日历」App 通知中开启；网页开着时用网页音乐提醒",notifGrp:"系统通知",reqNotif:"开启系统通知",notifOn:"✅ 系统通知已开启，页面在后台也能弹提醒",notifDeny:"通知权限被拒绝，请在浏览器地址栏权限设置中允许",notifNoSvc:"当前环境不支持系统通知，请用 Chrome/Edge 打开",notifTest:"通知已就绪 💧",notifNote:"💡 开启后页面最小化/后台（电脑）也会弹系统通知；完全关闭页面仍需日历兜底"},
-en:{title:"\uD83D\uDCA7 Water Reminder",sub:"Stay hydrated · Stay healthy",done:"Drunk",goal:"Goal",ml:"Drunk(ml)",next:"Next",settings:"Settings",goalIn:"Daily goal (cups)",cupMl:"Cup size (ml)",start:"Start time",end:"End time",sched:"Schedule",manual:"Custom",auto:"Auto",freq:"Frequency (min)",redist:"Redistribute",manualHint:"Add time points or use auto-distribute",add:"Add",startBtn:"Start",pause:"Pause",reset:"Reset",method:"Reminder method",music:"Music",vibrate:"Vibrate",silent:"Silent",lang:"Language",close:"OK",drinkBtn:"Drink",undo:"Undo",goalDone:"\uD83C\uDF89 Daily goal achieved!",reminderOn:"\u2705 Reminders on",resetMsg:"\u21BB Reset",timeUp:"\u26A0\uFE0F Time to drink water!",healthHigh:"\u26A0\uFE0F You've had {ml} ml today. Drinking too much water in a short time may cause hyponatremia. Listen to your body.",healthNear:"\uD83D\uDC4D Almost there! Drink when you feel thirsty, no need to force it.",settingsTitle:"\u2699\uFE0F Settings",musicStyle:"Music style",ms0:"Gentle",ms1:"Lively",ms2:"Meditate",ms3:"Stream",about:"Sources & licenses",aboutMusic:"🎵 Music: synthesized in real time by this page via Web Audio API (water-drop intro + multi-style melodies). No third-party audio. Author: page owner · Source: built-in synth engine · License ",aboutImage:"🖼️ Cover photo: water drop ripples · Source: provided by user · personal non-commercial use only",cupOf:"Cup {n} of {g}",snoozeBtn:"Snooze 10 min",exportBtn:"Export .ics",icsTitle:"Water reminder cup {n}/{g}",icsDesc:"Time to drink a cup of water ({ml} ml)",exported:"📅 Exported water-reminder.ics — import it into your calendar app",calTest:"Calendar alerts",testIcs:"Test alert (in 2 min)",testExported:"Test event exported (fires in 2 min). Import it to verify calendar notifications",calNote:"💡 Enable sound/vibration for the Calendar app in your phone's system notification settings. Keep this page open for music reminders",notifGrp:"System notifications",reqNotif:"Enable notifications",notifOn:"✅ Notifications on — reminders fire even in background",notifDeny:"Permission denied. Allow notifications from the browser address bar",notifNoSvc:"Notifications unsupported here — open in Chrome/Edge",notifTest:"Notifications ready 💧",notifNote:"💡 With notifications on, minimized/background tabs (desktop) still alert. Closed pages still need the calendar fallback"},
-ko:{title:"\uD83D\uDCA7 \uC218 \uB9C8\uC2DC\uAE30 \uC54C\uB9BC",sub:"\uAC74\uAC15\uD55C \uC218\uBD84 \uBCF4\uCD95",done:"\uB9C8\uC2E0",goal:"\uBAA9\uD45C",ml:"\uB9C8\uC2E0(ml)",next:"\uB2E4\uC74C",settings:"\uC124\uC815",goalIn:"\uC77C\uC77C \uBAA9\uD45C（\uCEF5）",cupMl:"\uCEF5 \uC6A9\uB7C9（ml）",start:"\uC2DC\uC791 \uC2DC\uAC04",end:"\uC885\uB8CC \uC2DC\uAC04",sched:"\uC2A4\uCF00\uC904",manual:"\uC9C1\uC811",auto:"\uC790\uB3D9",freq:"\uBE48\uB3C4（\uBD84）",redist:"\uB2E4\uC2DC \uBC30\uCE58",manualHint:"\uC2DC\uAC04\uC744 \uCD94\uAC00\uD558\uAC70\uB098 \uC790\uB3D9 \uBD84\uBC30 \uC0AC\uC6A9",add:"\uCD94\uAC00",startBtn:"\uC2DC\uC791",pause:"\uC77C\uC2DC\uC815\uC9C0",reset:"\uCD08\uAE30\uD654",method:"\uC54C\uB9BC \uBC29\uBC95",music:"\uC74C\uC545",vibrate:"\uC9C4\uB3D9",silent:"\uBB34\uC74C",lang:"\uC5B8\uC5B4",close:"\uD655\uC778",drinkBtn:"\uB9C8\uC2E4",undo:"\uCDE8\uC18C",goalDone:"\uD83C\uDF89 \uBAA9\uD45C \uB2EC\uC131!",reminderOn:"\u2705 \uC54C\uB9BC \uC2DC\uC791",resetMsg:"\u21BB \uCD08\uAE30\uD654\uB428",timeUp:"\u26A0\uFE0F \uC218 \uB9C8\uC2EC \uC2DC\uAC04!",healthHigh:"\u26A0\uFE0F \uC624\uB298 {ml}ml\uB97C \uB9C8\uC168\uC2B5\uB2C8\uB2E4. \uB108\uBB34 \uB9CE\uC774 \uB9C8\uC2DC\uBA74 \uC800\uB098\uD2B8\uB9D8 \uC99D\uC774 \uC788\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",healthNear:"\uD83D\uDC4D \uAC70\uC758 \uB2E4\uB410\uC2B5\uB2C8\uB2E4! \uAC08\uC99D\uC5D0 \uB9C8\uC2DC\uBA74 \uB429\uB2C8\uB2E4.",settingsTitle:"\u2699\uFE0F \uC124\uC815",musicStyle:"음악 스타일",ms0:"부드러운",ms1:"경쾌한",ms2:"명상",ms3:"물소리",about:"출처 및 라이선스",aboutMusic:"🎵 음악: Web Audio API 실시간 합성(물방울 인트로 + 다양한 스타일). 제3자 오디오 없음. 작성자: 페이지 작성자 · 출처: 내장 신디사이저 · 라이선스 ",aboutImage:"🖼️ 표지 사진: 물방울 물결 · 출처: 사용자 제공 · 개인 비상업적 용도로만 사용",cupOf:"{g}잔 중 {n}번째",snoozeBtn:"10분 후 알림",exportBtn:"달력 내보내기",icsTitle:"물 마시기 {g}잔 중 {n}번째",icsDesc:"물 한 잔({ml}ml) 마실 시간이에요",exported:"📅 water-reminder.ics 내보냈어요 — 달력 앱에 가져가세요",calTest:"달력 알림",testIcs:"테스트 알림(2분 후)",testExported:"테스트 일정을 내보냈어요(2분 후). 달력 알림을 확인하세요",calNote:"💡 달력 알림의 소리/진동은 휴대폰 시스템 설정의 달력 앱 알림에서 켜세요. 페이지를 열어두면 음악 알림이 작동해요",notifGrp:"시스템 알림",reqNotif:"알림 켜기",notifOn:"✅ 알림이 켜졌어요 — 백그라운드에서도 알려줘요",notifDeny:"권한이 거부되었어요. 브라우저 주소창 권한 설정에서 허용해 주세요",notifNoSvc:"이 환경은 알림을 지원하지 않아요 — Chrome/Edge로 열어 주세요",notifTest:"알림 준비 완료 💧",notifNote:"💡 알림을 켜면 최소화/백그라운드(PC)에서도 알림이 와요. 완전히 닫으면 달력이 필요해요"},
-fr:{title:"\uD83D\uDCA7 Rappel d'hydratation",sub:"Restez hydrat\u00E9 · Restez en sant\u00E9",done:"Bu",goal:"Objectif",ml:"Bu(ml)",next:"Prochain",settings:"Param\u00E8tres",goalIn:"Objectif (verres)",cupMl:"Taille (ml)",start:"Heure d\u00E9but",end:"Heure fin",sched:"Planification",manual:"Manuel",auto:"Auto",freq:"Fr\u00E9quence (min)",redist:"Redistribuer",manualHint:"Ajoutez des moments ou utilisez l'auto",add:"Ajouter",startBtn:"D\u00E9marrer",pause:"Pause",reset:"R\u00E9initialiser",method:"M\u00E9thode",music:"Musique",vibrate:"Vibrer",silent:"Silencieux",lang:"Langue",close:"OK",drinkBtn:"Bu",undo:"Annuler",goalDone:"\uD83C\uDF89 Objectif atteint !",reminderOn:"\u2705 Rappels activ\u00E9s",resetMsg:"\u21BB R\u00E9initialis\u00E9",timeUp:"\u26A0\uFE0F C'est l'heure de boire !",healthHigh:"\u26A0\uFE0F Vous avez bu {ml} ml aujourd'hui. Trop d'eau en peu de temps peut causer une hyponatr\u00E9mie. \u00C9coutez votre corps.",healthNear:"\uD83D\uDC4D Presque l\u00E0 ! Buvez quand vous avez soif, pas besoin de forcer.",settingsTitle:"\u2699\uFE0F Param\u00E8tres",musicStyle:"Style musical",ms0:"Doux",ms1:"Vif",ms2:"Méditation",ms3:"Ruisseau",about:"Sources et licences",aboutMusic:"🎵 Musique : synthétisée en temps réel via Web Audio API (intro goutte d'eau + mélodies variées). Aucun audio tiers. Auteur : propriétaire de la page · Source : moteur de synthèse intégré · Licence ",aboutImage:"🖼️ Photo de couverture : goutte d'eau et ondulations · Source : fournie par l'utilisateur · usage personnel non commercial uniquement",cupOf:"Verre {n} sur {g}",snoozeBtn:"Plus tard (10 min)",exportBtn:"Exporter .ics",icsTitle:"Rappel hydratation {n}/{g}",icsDesc:"C'est l'heure de boire un verre ({ml} ml)",exported:"📅 water-reminder.ics exporté — importez-le dans votre app calendrier",calTest:"Alertes calendrier",testIcs:"Test (dans 2 min)",testExported:"Événement test exporté (dans 2 min). Importez-le pour vérifier les notifications",calNote:"💡 Activez son/vibration de l'app Calendrier dans les notifications système. Gardez la page ouverte pour la musique",notifGrp:"Notifications système",reqNotif:"Activer les notifications",notifOn:"✅ Notifications activées — alertes même en arrière-plan",notifDeny:"Permission refusée. Autorisez les notifications depuis la barre d'adresse",notifNoSvc:"Notifications non prises en charge ici — ouvrez avec Chrome/Edge",notifTest:"Notifications prêtes 💧",notifNote:"💡 Une fois activées, les fenêtres réduites/arrière-plan (PC) reçoivent des alertes. Page fermée = calendrier requis"}
+zh:{title:"\uD83D\uDCA7 喝水提醒",sub:"科学补水 · 自主掌控",done:"已喝",goal:"目标",ml:"已喝(ml)",next:"下次提醒",settings:"设置",goalIn:"每日目标（杯）",cupMl:"每杯容量（ml）",start:"开始时间",end:"结束时间",sched:"时间安排",manual:"自定义",auto:"均分",freq:"频率（分钟/次）",redist:"重新分配",manualHint:"点击添加时间点或用均分微调",add:"添加",startBtn:"开始",pause:"暂停",reset:"重置",method:"提醒方式",music:"音乐",vibrate:"震动",silent:"静音",lang:"语言",close:"确定",drinkBtn:"喝了",undo:"撤销",goalDone:"\uD83C\uDF89 今日目标已达成！",reminderOn:"\u2705 提醒已开启",resetMsg:"\u21BB 已重置",timeUp:"\u26A0\uFE0F 到点了！该喝水了",healthHigh:"\u26A0\uFE0F 今日已饮水 {ml} ml，短时间内大量饮水可能导致低钠血症。请根据身体需要适量饮用，不必强求达标。",healthNear:"\uD83D\uDC4D 已接近目标！身体感到口渴再喝即可，不必勉强。",settingsTitle:"\u2699\uFE0F 设置",musicStyle:"音乐风格",ms0:"轻柔",ms1:"活泼",ms2:"冥想",ms3:"流水",ms4:"歌曲",about:"来源与许可",aboutMusic:"🎵 音乐：Web Audio API 实时程序合成（水滴声开场＋多风格旋律），另含用户提供的歌曲 music.mp3（版权归原权利人，仅供个人使用，请勿二次分发）。来源：内置合成引擎 / 用户提供 · 许可证 ",aboutImage:"🖼️ 封面图：水滴入水激起涟漪照片 · 来源：用户提供 · 仅供个人非商业使用",cupOf:"第 {n} / {g} 杯",snoozeBtn:"稍后 10 分钟",exportBtn:"导出日历",icsTitle:"喝水提醒 第 {n} / {g} 杯",icsDesc:"到点了，喝一杯 {ml} ml 的水",exported:"📅 已导出 water-reminder.ics，请在日历 App 中导入使用",calTest:"日历提醒",testIcs:"测试提醒（2分钟后）",testExported:"已导出测试事件（2分钟后触发）。导入日历后留意系统通知，可验证提醒链路",calNote:"💡 日历提醒的声音/震动请在手机系统设置的「日历」App 通知中开启；网页开着时用网页音乐提醒",notifGrp:"系统通知",reqNotif:"开启系统通知",notifOn:"✅ 系统通知已开启，页面在后台也能弹提醒",notifDeny:"通知权限被拒绝，请在浏览器地址栏权限设置中允许",notifNoSvc:"当前环境不支持系统通知，请用 Chrome/Edge 打开",notifTest:"通知已就绪 💧",notifNote:"💡 开启后页面最小化/后台（电脑）也会弹系统通知；完全关闭页面仍需日历兜底",sync:"同步",syncCopied:"🔗 配置链接已复制！发给手机/其他设备打开即自动套用",syncApplied:"✅ 已套用分享链接里的配置"},
+en:{title:"\uD83D\uDCA7 Water Reminder",sub:"Stay hydrated · Stay healthy",done:"Drunk",goal:"Goal",ml:"Drunk(ml)",next:"Next",settings:"Settings",goalIn:"Daily goal (cups)",cupMl:"Cup size (ml)",start:"Start time",end:"End time",sched:"Schedule",manual:"Custom",auto:"Auto",freq:"Frequency (min)",redist:"Redistribute",manualHint:"Add time points or use auto-distribute",add:"Add",startBtn:"Start",pause:"Pause",reset:"Reset",method:"Reminder method",music:"Music",vibrate:"Vibrate",silent:"Silent",lang:"Language",close:"OK",drinkBtn:"Drink",undo:"Undo",goalDone:"\uD83C\uDF89 Daily goal achieved!",reminderOn:"\u2705 Reminders on",resetMsg:"\u21BB Reset",timeUp:"\u26A0\uFE0F Time to drink water!",healthHigh:"\u26A0\uFE0F You've had {ml} ml today. Drinking too much water in a short time may cause hyponatremia. Listen to your body.",healthNear:"\uD83D\uDC4D Almost there! Drink when you feel thirsty, no need to force it.",settingsTitle:"\u2699\uFE0F Settings",musicStyle:"Music style",ms0:"Gentle",ms1:"Lively",ms2:"Meditate",ms3:"Stream",ms4:"Song",about:"Sources & licenses",aboutMusic:"🎵 Music: real-time Web Audio synthesis (water-drop intro + multi-style melodies); plus user-provided song music.mp3 (personal use only, do not redistribute). Source: built-in synth / user-provided · License ",aboutImage:"🖼️ Cover photo: water drop ripples · Source: provided by user · personal non-commercial use only",cupOf:"Cup {n} of {g}",snoozeBtn:"Snooze 10 min",exportBtn:"Export .ics",icsTitle:"Water reminder cup {n}/{g}",icsDesc:"Time to drink a cup of water ({ml} ml)",exported:"📅 Exported water-reminder.ics — import it into your calendar app",calTest:"Calendar alerts",testIcs:"Test alert (in 2 min)",testExported:"Test event exported (fires in 2 min). Import it to verify calendar notifications",calNote:"💡 Enable sound/vibration for the Calendar app in your phone's system notification settings. Keep this page open for music reminders",notifGrp:"System notifications",reqNotif:"Enable notifications",notifOn:"✅ Notifications on — reminders fire even in background",notifDeny:"Permission denied. Allow notifications from the browser address bar",notifNoSvc:"Notifications unsupported here — open in Chrome/Edge",notifTest:"Notifications ready 💧",notifNote:"💡 With notifications on, minimized/background tabs (desktop) still alert. Closed pages still need the calendar fallback",sync:"Sync",syncCopied:"🔗 Config link copied! Open it on your phone/another device to apply",syncApplied:"✅ Applied the shared config"},
+ko:{title:"\uD83D\uDCA7 \uC218 \uB9C8\uC2DC\uAE30 \uC54C\uB9BC",sub:"\uAC74\uAC15\uD55C \uC218\uBD84 \uBCF4\uCD95",done:"\uB9C8\uC2E0",goal:"\uBAA9\uD45C",ml:"\uB9C8\uC2E0(ml)",next:"\uB2E4\uC74C",settings:"\uC124\uC815",goalIn:"\uC77C\uC77C \uBAA9\uD45C（\uCEF5）",cupMl:"\uCEF5 \uC6A9\uB7C9（ml）",start:"\uC2DC\uC791 \uC2DC\uAC04",end:"\uC885\uB8CC \uC2DC\uAC04",sched:"\uC2A4\uCF00\uC904",manual:"\uC9C1\uC811",auto:"\uC790\uB3D9",freq:"\uBE48\uB3C4（\uBD84）",redist:"\uB2E4\uC2DC \uBC30\uCE58",manualHint:"\uC2DC\uAC04\uC744 \uCD94\uAC00\uD558\uAC70\uB098 \uC790\uB3D9 \uBD84\uBC30 \uC0AC\uC6A9",add:"\uCD94\uAC00",startBtn:"\uC2DC\uC791",pause:"\uC77C\uC2DC\uC815\uC9C0",reset:"\uCD08\uAE30\uD654",method:"\uC54C\uB9BC \uBC29\uBC95",music:"\uC74C\uC545",vibrate:"\uC9C4\uB3D9",silent:"\uBB34\uC74C",lang:"\uC5B8\uC5B4",close:"\uD655\uC778",drinkBtn:"\uB9C8\uC2E4",undo:"\uCDE8\uC18C",goalDone:"\uD83C\uDF89 \uBAA9\uD45C \uB2EC\uC131!",reminderOn:"\u2705 \uC54C\uB9BC \uC2DC\uC791",resetMsg:"\u21BB \uCD08\uAE30\uD654\uB428",timeUp:"\u26A0\uFE0F \uC218 \uB9C8\uC2EC \uC2DC\uAC04!",healthHigh:"\u26A0\uFE0F \uC624\uB298 {ml}ml\uB97C \uB9C8\uC168\uC2B5\uB2C8\uB2E4. \uB108\uBB34 \uB9CE\uC774 \uB9C8\uC2DC\uBA74 \uC800\uB098\uD2B8\uB9D8 \uC99D\uC774 \uC788\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",healthNear:"\uD83D\uDC4D \uAC70\uC758 \uB2E4\uB410\uC2B5\uB2C8\uB2E4! \uAC08\uC99D\uC5D0 \uB9C8\uC2DC\uBA74 \uB429\uB2C8\uB2E4.",settingsTitle:"\u2699\uFE0F \uC124\uC815",musicStyle:"음악 스타일",ms0:"부드러운",ms1:"경쾌한",ms2:"명상",ms3:"물소리",ms4:"노래",about:"출처 및 라이선스",aboutMusic:"🎵 음악: Web Audio API 실시간 합성(물방울 인트로 + 다양한 스타일) 및 사용자 제공 곡 music.mp3(개인용, 재배포 금지). 출처: 내장 신디사이저 / 사용자 제공 · 라이선스 ",aboutImage:"🖼️ 표지 사진: 물방울 물결 · 출처: 사용자 제공 · 개인 비상업적 용도로만 사용",cupOf:"{g}잔 중 {n}번째",snoozeBtn:"10분 후 알림",exportBtn:"달력 내보내기",icsTitle:"물 마시기 {g}잔 중 {n}번째",icsDesc:"물 한 잔({ml}ml) 마실 시간이에요",exported:"📅 water-reminder.ics 내보냈어요 — 달력 앱에 가져가세요",calTest:"달력 알림",testIcs:"테스트 알림(2분 후)",testExported:"테스트 일정을 내보냈어요(2분 후). 달력 알림을 확인하세요",calNote:"💡 달력 알림의 소리/진동은 휴대폰 시스템 설정의 달력 앱 알림에서 켜세요. 페이지를 열어두면 음악 알림이 작동해요",notifGrp:"시스템 알림",reqNotif:"알림 켜기",notifOn:"✅ 알림이 켜졌어요 — 백그라운드에서도 알려줘요",notifDeny:"권한이 거부되었어요. 브라우저 주소창 권한 설정에서 허용해 주세요",notifNoSvc:"이 환경은 알림을 지원하지 않아요 — Chrome/Edge로 열어 주세요",notifTest:"알림 준비 완료 💧",notifNote:"💡 알림을 켜면 최소화/백그라운드(PC)에서도 알림이 와요. 완전히 닫으면 달력이 필요해요",sync:"동기화",syncCopied:"🔗 설정 링크를 복사했어요! 휴대폰에서 열면 자동 적용돼요",syncApplied:"✅ 공유된 설정을 적용했어요"},
+fr:{title:"\uD83D\uDCA7 Rappel d'hydratation",sub:"Restez hydrat\u00E9 · Restez en sant\u00E9",done:"Bu",goal:"Objectif",ml:"Bu(ml)",next:"Prochain",settings:"Param\u00E8tres",goalIn:"Objectif (verres)",cupMl:"Taille (ml)",start:"Heure d\u00E9but",end:"Heure fin",sched:"Planification",manual:"Manuel",auto:"Auto",freq:"Fr\u00E9quence (min)",redist:"Redistribuer",manualHint:"Ajoutez des moments ou utilisez l'auto",add:"Ajouter",startBtn:"D\u00E9marrer",pause:"Pause",reset:"R\u00E9initialiser",method:"M\u00E9thode",music:"Musique",vibrate:"Vibrer",silent:"Silencieux",lang:"Langue",close:"OK",drinkBtn:"Bu",undo:"Annuler",goalDone:"\uD83C\uDF89 Objectif atteint !",reminderOn:"\u2705 Rappels activ\u00E9s",resetMsg:"\u21BB R\u00E9initialis\u00E9",timeUp:"\u26A0\uFE0F C'est l'heure de boire !",healthHigh:"\u26A0\uFE0F Vous avez bu {ml} ml aujourd'hui. Trop d'eau en peu de temps peut causer une hyponatr\u00E9mie. \u00C9coutez votre corps.",healthNear:"\uD83D\uDC4D Presque l\u00E0 ! Buvez quand vous avez soif, pas besoin de forcer.",settingsTitle:"\u2699\uFE0F Param\u00E8tres",musicStyle:"Style musical",ms0:"Doux",ms1:"Vif",ms2:"Méditation",ms3:"Ruisseau",ms4:"Chanson",about:"Sources et licences",aboutMusic:"🎵 Musique : synthèse Web Audio temps réel (intro goutte d'eau + mélodies variées) ; plus le morceau fourni music.mp3 (usage personnel uniquement, ne pas redistribuer). Source : moteur intégré / fourni par l'utilisateur · Licence : ",aboutImage:"🖼️ Photo de couverture : goutte d'eau et ondulations · Source : fournie par l'utilisateur · usage personnel non commercial uniquement",cupOf:"Verre {n} sur {g}",snoozeBtn:"Plus tard (10 min)",exportBtn:"Exporter .ics",icsTitle:"Rappel hydratation {n}/{g}",icsDesc:"C'est l'heure de boire un verre ({ml} ml)",exported:"📅 water-reminder.ics exporté — importez-le dans votre app calendrier",calTest:"Alertes calendrier",testIcs:"Test (dans 2 min)",testExported:"Événement test exporté (dans 2 min). Importez-le pour vérifier les notifications",calNote:"💡 Activez son/vibration de l'app Calendrier dans les notifications système. Gardez la page ouverte pour la musique",notifGrp:"Notifications système",reqNotif:"Activer les notifications",notifOn:"✅ Notifications activées — alertes même en arrière-plan",notifDeny:"Permission refusée. Autorisez les notifications depuis la barre d'adresse",notifNoSvc:"Notifications non prises en charge ici — ouvrez avec Chrome/Edge",notifTest:"Notifications prêtes 💧",notifNote:"💡 Une fois activées, les fenêtres réduites/arrière-plan (PC) reçoivent des alertes. Page fermée = calendrier requis",sync:"Synchroniser",syncCopied:"🔗 Lien de config copié ! Ouvrez-le sur votre téléphone pour l'appliquer",syncApplied:"✅ Config partagée appliquée"}
 };
 var lang="zh", method=0;
 function savePrefs(){try{localStorage.setItem("waterPrefs",JSON.stringify({lang:lang,method:method,style:musicStyle}))}catch(x){}}
@@ -288,13 +306,13 @@ $("l_goalIn").textContent=L.goalIn;$("l_cupMl").textContent=L.cupMl;
 $("l_start").textContent=L.start;$("l_end").textContent=L.end;$("t_sched").innerHTML="\u23F0 "+L.sched;
 $("tabM").textContent=L.manual;$("tabA").textContent=L.auto;$("l_freq").textContent=L.freq;
 $("l_redist").textContent=L.redist;$("l_manualHint").textContent=L.manualHint;
-$("l_add").textContent=L.add;$("l_startBtn").textContent=L.startBtn;$("l_pause").textContent=L.pause;$("l_reset").textContent=L.reset;$("l_export").textContent=L.exportBtn;
+$("l_add").textContent=L.add;$("l_startBtn").textContent=L.startBtn;$("l_pause").textContent=L.pause;$("l_reset").textContent=L.reset;$("l_export").textContent=L.exportBtn;$("l_sync").textContent=L.sync;
 $("t_settingsTitle").innerHTML="\u2699\uFE0F "+L.settings;$("l_method").innerHTML="\uD83D\uDD0A "+L.method;
 $("mMusic").innerHTML="\uD83C\uDFB5 "+L.music;$("mVibrate").innerHTML="\uD83D\uDCF3 "+L.vibrate;$("mSilent").innerHTML="\uD83D\uDD07 "+L.silent;
 $("l_lang").innerHTML="\uD83C\uDF10 "+L.lang;$("l_close").textContent=L.close;
 $("l_musicStyle").innerHTML="\uD83C\uDFB5 "+L.musicStyle;
-var msp=["\uD83D\uDCA7","\u2728","\uD83E\uDDD8","\uD83C\uDF0A"];
-for(var mi=0;mi<4;mi++)$("msB"+mi).textContent=msp[mi]+" "+L["ms"+mi];
+var msp=["\uD83D\uDCA7","\u2728","\uD83E\uDDD8","\uD83C\uDF0A","\uD83C\uDFB5"];
+for(var mi=0;mi<5;mi++)$("msB"+mi).textContent=msp[mi]+" "+L["ms"+mi];
 $("t_about").innerHTML="\u2139\uFE0F "+L.about;
 $("aMusic").innerHTML=L.aboutMusic+'<a href="https://creativecommons.org/publicdomain/zero/1.0/deed.zh" target="_blank" rel="noopener">CC0 1.0 ↗</a>'+(lang==="en"||lang==="fr"?' <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">(EN)</a>':"");
 $("aImg").textContent=L.aboutImage;
@@ -306,7 +324,7 @@ function setLang(l){lang=l;applyLang();savePrefs();
 $({zh:"lgZh",en:"lgEn",ko:"lgKo",fr:"lgFr"}[l]).classList.add("on")}
 function setMethod(m,quiet){method=m;["mMusic","mVibrate","mSilent"].forEach(function(id,i){$(id).classList.toggle("on",i===m)});
 if(m===0&&!quiet)playReminder(true);savePrefs()}
-function setMusicStyle(s,quiet){musicStyle=s;for(var i=0;i<4;i++)$("msB"+i).classList.toggle("on",i===s);savePrefs();if(!quiet)playReminder(true)}
+function setMusicStyle(s,quiet){musicStyle=s;for(var i=0;i<5;i++)$("msB"+i).classList.toggle("on",i===s);savePrefs();if(!quiet)playReminder(true)}
 function openSettings(){$("settingsModal").classList.add("show")}
 function closeSettings(){$("settingsModal").classList.remove("show")}
 
@@ -341,26 +359,21 @@ modal.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.3
 var box=document.createElement('div');
 box.style.cssText='background:rgba(255,255,255,.82);backdrop-filter:blur(14px);border-radius:18px;padding:22px;max-width:320px;width:88%;box-shadow:0 12px 40px rgba(0,0,0,.2)';
 box.innerHTML='<div style="font-size:.9em;font-weight:600;color:#01579b;margin-bottom:12px;text-align:center">&#x23F1; &#x9009;&#x62E9;&#x65F6;&#x95F4;</div>';
-var row=document.createElement('div');row.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:14px';
-function mkField(label,max,val){var f=document.createElement('div');f.style.cssText='flex:1;text-align:center';
-var inp=document.createElement('input');inp.type='number';inp.min=0;inp.max=max;inp.value=val;
-inp.style.cssText='width:100%;padding:8px;border:2px solid #b3e5fc;border-radius:10px;text-align:center;font-size:1.1em;color:#01579b';inp.id='tp_'+label;
-var lb=document.createElement('div');lb.textContent=label;lb.style.cssText='font-size:.7em;color:#0277bd;margin-top:4px';
-f.appendChild(inp);f.appendChild(lb);row.appendChild(f)}
 var now=new Date();
-mkField('h',23,now.getHours());mkField('m',59,now.getMinutes());mkField('s',59,0);
-box.appendChild(row);
-var btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px';
+var inp=document.createElement('input');inp.type='time';inp.step=1;inp.id='tp_time';
+inp.value=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0")+":00";
+inp.style.cssText='width:100%;padding:10px;border:2px solid #b3e5fc;border-radius:12px;text-align:center;font-size:1.15em;color:#01579b;background:#fff';
+box.appendChild(inp);
+var btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;margin-top:14px';
 var okBtn=document.createElement('button');okBtn.textContent='OK';okBtn.style.cssText='flex:1;padding:10px;border:none;border-radius:12px;background:#0288d1;color:#fff;font-weight:600;cursor:pointer';
 var cancelBtn=document.createElement('button');cancelBtn.textContent='X';cancelBtn.style.cssText='flex:1;padding:10px;border:none;border-radius:12px;background:#e1f5fe;color:#0277bd;font-weight:600;cursor:pointer';
 btnRow.appendChild(okBtn);btnRow.appendChild(cancelBtn);box.appendChild(btnRow);
 modal.appendChild(box);document.body.appendChild(modal);
 cancelBtn.onclick=function(){document.body.removeChild(modal)};
 okBtn.onclick=function(){
-var h=Math.min(23,Math.max(0,+document.getElementById('tp_h').value||0));
-var m=Math.min(59,Math.max(0,+document.getElementById('tp_m').value||0));
-var sec=Math.min(59,Math.max(0,+document.getElementById('tp_s').value||0));
-var total=h*3600+m*60+sec;
+var v=document.getElementById('tp_time').value||"08:00:00";
+if(v.length===5)v+=":00";
+var total=toSec(v);
 slots.push(toTime(total));done.push(false);sortSlots();$("goalInput").value=slots.length;
 document.body.removeChild(modal);renderSchedule();updateDisplay();if(running)scheduleNext();
 }}
@@ -454,6 +467,30 @@ function dlICS(L,name){var blob=new Blob([L.join("\r\n")],{type:"text/calendar;c
 var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;
 document.body.appendChild(a);a.click();document.body.removeChild(a);
 setTimeout(function(){URL.revokeObjectURL(a.href)},3000)}
+function shareCfg(){
+var cfg={s:slots,g:$("goalInput").value,c:$("cupMl").value,st:$("startT").value,e:$("endT").value,m:method,ms:musicStyle,l:lang,d:dateMode,td:$("targetDate").value};
+var url=location.origin+location.pathname+"#cfg="+encodeURIComponent(JSON.stringify(cfg));
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(url).then(function(){toast(t("syncCopied"),"d",6000)},function(){toast(url,"i",9000)})}
+else toast(url,"i",9000)}
+function applyCfgFromHash(){
+try{
+if(location.hash.indexOf("#cfg=")!==0)return;
+var cfg=JSON.parse(decodeURIComponent(location.hash.slice(5)));
+if(cfg.s&&cfg.s.length){slots=cfg.s.slice();done=new Array(slots.length).fill(false)}
+if(cfg.g)$("goalInput").value=cfg.g;
+if(cfg.c)$("cupMl").value=cfg.c;
+if(cfg.st)$("startT").value=cfg.st;
+if(cfg.e)$("endT").value=cfg.e;
+if(cfg.m!=null)setMethod(cfg.m,true);
+if(cfg.ms!=null&&cfg.ms<=4)setMusicStyle(cfg.ms,true);
+if(cfg.d!=null)setDateMode(cfg.d);
+if(cfg.td)$("targetDate").value=cfg.td;
+if(cfg.l&&I18N[cfg.l])setLang(cfg.l);
+renderSchedule();updateDisplay();checkHealth();
+history.replaceState(null,"",location.pathname);
+toast(t("syncApplied"),"d",6000)
+}catch(x){}}
 function icsHead(){return["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Water Reminder//ZH//","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Water Reminder",
 "BEGIN:VTIMEZONE","TZID:Asia/Shanghai","BEGIN:STANDARD","DTSTART:19700101T000000","TZOFFSETFROM:+0800","TZOFFSETTO:+0800","TZNAME:CST","END:STANDARD","END:VTIMEZONE"]}
 function icsStamp(){var u=new Date(),p=function(n){return String(n).padStart(2,"0")};
@@ -494,7 +531,7 @@ L.push("BEGIN:VEVENT","UID:water-test-"+ts+"@waterreminder.local","DTSTAMP:"+ics
 "END:VEVENT","END:VCALENDAR");
 dlICS(L,"water-test.ics");
 toast(t("testExported"),"d",7000)}
-document.addEventListener('click',function(){try{ac()}catch(x){}},{once:true});initSlots();renderSchedule();updateDisplay();loadPrefs();applyLang();initSW();
+document.addEventListener('click',function(){try{ac()}catch(x){}},{once:true});initSlots();renderSchedule();updateDisplay();loadPrefs();applyCfgFromHash();applyLang();initSW();
 setInterval(function(){
 var d=new Date();
 $("bjTime").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");

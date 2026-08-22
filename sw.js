@@ -1,6 +1,6 @@
 /* water-pwa service worker */
-var CACHE = 'water-reminder-v1';
-var ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+var CACHE = 'water-reminder-v2';
+var ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './music.mp3'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(
