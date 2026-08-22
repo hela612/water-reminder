@@ -1,5 +1,5 @@
 /* water-pwa service worker */
-var CACHE = 'water-reminder-v4';
+var CACHE = 'water-reminder-v5';
 var ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './music.mp3'];
 
 self.addEventListener('install', function (e) {
@@ -20,6 +20,18 @@ self.addEventListener('activate', function (e) {
 
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
+  var isNav = e.request.mode === 'navigate';
+  if (isNav) {
+    /* 导航请求：网络优先，拿到最新页面并更新缓存；离线回退缓存 */
+    e.respondWith(
+      fetch(e.request).then(function (res) {
+        var cl = res.clone();
+        caches.open(CACHE).then(function (c) { c.put('./index.html', cl); });
+        return res;
+      }).catch(function () { return caches.match('./index.html'); })
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then(function (r) {
       if (r) return r;

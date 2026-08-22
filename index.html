@@ -273,7 +273,14 @@ function notify(){if(method===0)playReminder(false);else if(method===1&&navigato
 /* PWA: service worker + system notifications */
 var swReg=null,notifOK=false;
 function initSW(){if(!('serviceWorker' in navigator))return;
-try{navigator.serviceWorker.register('sw.js').then(function(r){swReg=r;updateNotifUI()}).catch(function(){})}catch(e){}}
+try{navigator.serviceWorker.register('sw.js').then(function(r){
+swReg=r;updateNotifUI();
+r.addEventListener('updatefound',function(){
+var nw=r.installing;
+if(nw)nw.addEventListener('statechange',function(){
+if(nw.state==='installed'&&navigator.serviceWorker.controller){try{location.reload()}catch(x){}}})});
+try{r.update()}catch(x){}
+}).catch(function(){})}catch(e){}}
 function reqNotif(){
 if(!('Notification' in window)){toast(t('notifNoSvc'),"w");return}
 Notification.requestPermission().then(function(p){
