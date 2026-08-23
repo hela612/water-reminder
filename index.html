@@ -169,7 +169,7 @@ h1 .ic{width:1.15em;height:1.15em;color:var(--primary)}
 <button class="tab" id="tabOnce" onclick="setDateMode(1)">指定日期</button>
 </div>
 <div id="datePanel" style="display:none;margin-bottom:8px;">
-<div class="row"><div class="f"><label>选择日期</label><input type="date" id="targetDate"></div></div>
+<div class="row"><div class="f"><label>选择日期</label><input type="date" id="targetDate" onchange="saveState()"></div></div>
 </div>
 <div class="tabs">
 <button class="tab on" id="tabM" onclick="setMode(0)" id="l_manual">自定义</button>
@@ -403,6 +403,21 @@ if(p.method!=null)setMethod(p.method,true);
 if(p.style!=null)setMusicStyle(p.style,true);
 if(p.rd!=null)setRemindDur([10,20,30].indexOf(p.rd),true);
 }catch(x){}}
+/* 完整状态持久化：时间表/打卡/设置/运行状态，跨天自动清零打卡 */
+var stateReady=false;
+function saveState(){try{localStorage.setItem("waterState",JSON.stringify({dt:new Date().toDateString(),sl:slots,dn:done,g:$("goalInput").value,cup:$("cupMl").value,stT:$("startT").value,eT:$("endT").value,dm:dateMode,td:$("targetDate").value,run:running}))}catch(x){}}
+function loadState(){try{
+var p=JSON.parse(localStorage.getItem("waterState")||"null");if(!p)return false;
+if(p.sl&&p.sl.length){slots=p.sl.slice();done=(p.dt===new Date().toDateString()&&p.dn&&p.dn.length===p.sl.length)?p.dn.slice():new Array(p.sl.length).fill(false)}
+if(p.g)$("goalInput").value=p.g;
+if(p.cup)$("cupMl").value=p.cup;
+if(p.stT)$("startT").value=p.stT;
+if(p.eT)$("endT").value=p.eT;
+if(p.dm!=null)setDateMode(p.dm);
+if(p.td)$("targetDate").value=p.td;
+if(p.run&&!running){running=true;scheduleNext();nativeAlarm("set")}
+return true
+}catch(x){return false}}
 function t(key){return I18N[lang][key]||I18N.zh[key]||key}
 var TIPS={
 zh:["小口慢饮更解渴，身体正在感谢你 💙","水分充足，头脑更清醒，继续加油！","喝完这杯，起身伸展一下，给身体充充电 ✨","规律饮水是好习惯，你的肾脏在微笑 😊","皮肤和大脑都喜欢水，这一杯刚刚好 💧","保持水分，下午的状态会更稳更好 🌤"],
@@ -455,6 +470,7 @@ function setDateMode(m){dateMode=m;
 $("tabDaily").classList.toggle("on",m===0);
 $("tabOnce").classList.toggle("on",m===1);
 $("datePanel").style.display=m===1?"":"none";
+saveState();
 if(running)scheduleNext()}
 function isToday(){if(dateMode===0)return true;
 var td=$("targetDate").value;if(!td)return false;
@@ -537,12 +553,12 @@ for(var i=0;i<slots.length;i++){var d=document.createElement("div");d.className=
 d.innerHTML='<span class="st-t">'+slots[i]+'</span><span class="st-a">'+(+$("cupMl").value||250)+' ml</span>'+
 (done[i]?'<button class="sb sb-u" onclick="undrink('+i+')">'+t("undo")+'</button>':'<button class="sb sb-d" onclick="drink('+i+')">'+t("drinkBtn")+'</button>')+
 '<button class="sb sb-u" onclick="removeSlot('+i+')">\u00D7</button>';list.appendChild(d)}
-syncNative()}
+syncNative();if(stateReady)saveState()}
 function updateDisplay(){var g=slots.length,d=done.filter(Boolean).length,ml=(+$("cupMl").value||250)*d;
 $("goalNum").textContent=g;$("doneNum").textContent=d;$("mlNum").textContent=ml;
 var p=g?Math.min(100,Math.round(d/g*100)):0;$("pctLabel").textContent=p+"%";$("waterBody").style.height=p+"%"}
-function startReminders(){running=true;scheduleNext();nativeSetup();nativeAlarm("set");toast(t("reminderOn"),"i")}
-function stopReminders(){running=false;clearTimeout(timer);stopChime();nativeAlarm("cancel");pendingZi=-1;$("drinkModal").classList.remove("show");$("nextTime").textContent="--:--"}
+function startReminders(){running=true;scheduleNext();nativeSetup();nativeAlarm("set");saveState();toast(t("reminderOn"),"i")}
+function stopReminders(){running=false;clearTimeout(timer);stopChime();nativeAlarm("cancel");saveState();pendingZi=-1;$("drinkModal").classList.remove("show");$("nextTime").textContent="--:--"}
 function slotInRange(ts){var s=toSec($("startT").value),e=toSec($("endT").value);if(s<=e)return ts>=s&&ts<=e;return ts>=s||ts<=e}
 function inRange(){
 var s=toSec($("startT").value),e=toSec($("endT").value);
@@ -647,7 +663,7 @@ L.push("BEGIN:VEVENT","UID:water-test-"+ts+"@waterreminder.local","DTSTAMP:"+ics
 "END:VEVENT","END:VCALENDAR");
 dlICS(L,"water-test.ics");
 toast(t("testExported"),"d",7000)}
-document.addEventListener('click',function(){try{ac()}catch(x){}},{once:true});initSlots();renderSchedule();updateDisplay();loadPrefs();applyCfgFromHash();applyLang();initSW();
+document.addEventListener('click',function(){try{ac()}catch(x){}},{once:true});initSlots();renderSchedule();updateDisplay();loadPrefs();var restored=loadState();stateReady=true;if(restored){renderSchedule();updateDisplay();checkHealth()}applyCfgFromHash();applyLang();initSW();
 setInterval(function(){
 var d=new Date();
 $("bjTime").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
