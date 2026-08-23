@@ -508,7 +508,7 @@ var total=toSec(v);
 slots.push(toTime(total));done.push(false);sortSlots();$("goalInput").value=slots.length;
 document.body.removeChild(modal);renderSchedule();updateDisplay();if(running)scheduleNext();
 }}
-function removeSlot(i){if(slots.length<=1)return;slots.splice(i,1);done.splice(i,1);$("goalInput").value=slots.length;renderSchedule();updateDisplay();checkHealth()}
+function removeSlot(i){if(slots.length<=1)return;slots.splice(i,1);done.splice(i,1);$("goalInput").value=slots.length;renderSchedule();updateDisplay();checkHealth();if(running)scheduleNext()}
 var pendingZi=-1;
 function showDrinkModal(i){
 pendingZi=i;var ml=+$("cupMl").value||250;
@@ -528,10 +528,10 @@ function snoozeDrink(){
 var zi=pendingZi;pendingZi=-1;$("drinkModal").classList.remove("show");stopChime();
 if(zi>=0&&!done[zi]){var d=new Date(Date.now()+600000);
 slots[zi]=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
-renderSchedule();updateDisplay()}
+sortSlots();renderSchedule();updateDisplay()}
 if(running)scheduleNext()}
 function drink(i){if(done[i])return;stopChime();nativeAlarm("stopring");if(pendingZi===i){pendingZi=-1;$("drinkModal").classList.remove("show")}done[i]=true;renderSchedule();updateDisplay();checkHealth();if(done.filter(Boolean).length>=slots.length){toast(t("goalDone"),"d");stopReminders()}}
-function undrink(i){done[i]=false;renderSchedule();updateDisplay()}
+function undrink(i){done[i]=false;renderSchedule();updateDisplay();if(running)scheduleNext()}
 function checkHealth(){
 var d=done.filter(Boolean).length,ml=d*(+$("cupMl").value||250),g=slots.length,totalMl=g*(+$("cupMl").value||250);
 var n=$("healthNote");
