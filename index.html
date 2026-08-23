@@ -12,67 +12,121 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,sans-serif;min-height:100vh;overflow:hidden;background:linear-gradient(180deg,#b3e5fc,#0288d1)}
+:root{
+--primary:#0284c7;--primary-deep:#075985;--cyan:#06b6d4;
+--ink:#0f2a3d;--ink-2:#33607a;--ink-3:#557a93;
+--card:rgba(255,255,255,.58);--card-soft:rgba(255,255,255,.34);--card-line:rgba(2,132,199,.14);
+--field:rgba(255,255,255,.5);
+--ok:#15803d;--warn:#b45309;--danger:#dc2626;
+--r-lg:16px;--r-md:12px;--r-sm:9px;
+--sp1:4px;--sp2:8px;--sp3:12px;--sp4:16px;--sp5:24px;
+--shadow:0 2px 6px rgba(8,47,73,.08),0 18px 48px rgba(8,47,73,.14);
+--ring:0 0 0 3px rgba(2,132,199,.35);
+--t:.18s cubic-bezier(.22,1,.36,1);
+}
+@media(prefers-color-scheme:dark){
+:root{
+--primary:#38bdf8;--primary-deep:#7dd3fc;--cyan:#22d3ee;
+--ink:#e3f4fd;--ink-2:#a8cfe3;--ink-3:#7fa8bf;
+--card:rgba(13,36,52,.62);--card-soft:rgba(13,36,52,.4);--card-line:rgba(125,211,252,.16);
+--field:rgba(9,26,38,.5);
+--ok:#4ade80;--warn:#fbbf24;--danger:#f87171;
+--shadow:0 2px 6px rgba(0,10,18,.3),0 18px 48px rgba(0,10,18,.45);
+--ring:0 0 0 3px rgba(56,189,248,.4);
+}
+}
+html{height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100dvh;overflow:hidden;background:linear-gradient(180deg,#bfe5f7,#0284c7);color:var(--ink)}
+@media(prefers-color-scheme:dark){body{background:linear-gradient(180deg,#06283a,#021a29)}}
+::selection{background:rgba(2,132,199,.28)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px}
 #bg{position:fixed;inset:0;z-index:0;width:100%;height:100%;object-fit:cover}
-#bgOv{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(1,87,155,.10),rgba(2,136,209,.02) 45%,rgba(227,247,255,.08))}
-.app{position:relative;z-index:1;background:rgba(255,255,255,.20);backdrop-filter:blur(14px);border-radius:28px;padding:24px;max-width:460px;width:100%;margin:auto;box-shadow:0 12px 48px rgba(2,136,209,.15);border:1px solid rgba(255,255,255,.45);max-height:92vh;overflow-y:auto}
-h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
-.sub{text-align:center;color:#0288d1;font-size:.8em;margin-bottom:16px;opacity:.75}
-.glass-wrap{position:relative;width:100px;height:140px;margin:0 auto 14px}
-.glass{position:absolute;inset:0;border:3px solid rgba(79,195,247,.7);border-radius:6px 6px 32px 32px;overflow:hidden;background:rgba(227,247,255,.3)}
-.wb{position:absolute;bottom:0;left:0;right:0;height:0%;background:linear-gradient(180deg,#4fc3f7cc,#0277bdcc);transition:height .8s cubic-bezier(.4,0,.2,1)}
-.wb::before{content:"";position:absolute;top:-10px;left:-50%;width:200%;height:20px;background:#4fc3f7aa;border-radius:45%;animation:wave 4s linear infinite}
+#bgOv{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(1,80,140,.16),rgba(2,132,199,.04) 45%,rgba(240,249,255,.14))}
+@media(prefers-color-scheme:dark){#bgOv{background:linear-gradient(180deg,rgba(1,15,28,.55),rgba(1,20,34,.72))}}
+.app{position:relative;z-index:1;background:var(--card);backdrop-filter:blur(18px) saturate(1.25);border-radius:var(--r-lg);padding:var(--sp5) var(--sp4);max-width:480px;width:100%;margin:auto;box-shadow:var(--shadow);max-height:94dvh;overflow-y:auto;scrollbar-width:thin}
+.app::-webkit-scrollbar,.sl-list::-webkit-scrollbar,.modal::-webkit-scrollbar{width:6px}
+.app::-webkit-scrollbar-thumb,.sl-list::-webkit-scrollbar-thumb,.modal::-webkit-scrollbar-thumb{background:rgba(2,132,199,.25);border-radius:99px}
+.ic{width:1.05em;height:1.05em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.14em;flex:none}
+header.top{display:flex;align-items:center;gap:var(--sp3);margin-bottom:var(--sp4)}
+.brand{flex:1;min-width:0}
+h1{font-size:1.22rem;font-weight:700;letter-spacing:-.01em;color:var(--ink);display:flex;align-items:center;gap:6px}
+h1 .ic{width:1.15em;height:1.15em;color:var(--primary)}
+.sub{color:var(--ink-2);font-size:.78rem;margin-top:2px}
+.bj-pill{font-variant-numeric:tabular-nums;color:var(--ink-2);background:var(--card-soft);border-radius:99px;padding:6px 12px;font-size:.8rem;font-weight:600;white-space:nowrap}
+.icon-btn{width:40px;height:40px;border:none;border-radius:var(--r-sm);background:var(--card-soft);color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background var(--t),color var(--t)}
+.icon-btn:hover{background:rgba(255,255,255,.75);color:var(--primary)}
+@media(prefers-color-scheme:dark){.icon-btn:hover{background:rgba(125,211,252,.18)}}
+.hero{display:flex;align-items:center;gap:var(--sp5);margin-bottom:var(--sp4)}
+.glass-wrap{position:relative;width:112px;height:150px;flex:none}
+.glass{position:absolute;inset:0;border:3px solid rgba(94,196,255,.75);border-radius:8px 8px 30px 30px;overflow:hidden;background:rgba(224,247,255,.22)}
+@media(prefers-color-scheme:dark){.glass{border-color:rgba(56,189,248,.55);background:rgba(125,211,252,.1)}}
+.wb{position:absolute;bottom:0;left:0;right:0;height:0%;background:linear-gradient(180deg,#38bdf8d9,#0369a1d9);transition:height .8s cubic-bezier(.22,1,.36,1)}
+.wb::before{content:"";position:absolute;top:-10px;left:-50%;width:200%;height:20px;background:#7dd3fabb;border-radius:45%;animation:wave 4s linear infinite}
 @keyframes wave{0%{transform:translateX(-25%) rotate(0)}100%{transform:translateX(25%) rotate(360deg)}}
-.pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:700;color:#01579b;font-size:1.2em;z-index:2;pointer-events:none}
-.stats{display:flex;justify-content:space-around;margin-bottom:14px;text-align:center}
-.sn{font-size:1.3em;font-weight:700;color:#0277bd}
-.sl{font-size:.7em;color:#0288d1;opacity:.7;margin-top:2px}
-.st{font-size:.82em;font-weight:600;color:#0277bd;margin:14px 0 6px;display:flex;align-items:center;gap:6px}
-.st::after{content:"";flex:1;height:1px;background:rgba(79,195,247,.25)}
-.row{display:flex;gap:8px;margin-bottom:8px}
-.f{flex:1}.f label{display:block;font-size:.72em;color:#0277bd;margin-bottom:3px;font-weight:500}
-.f input{width:100%;padding:8px 9px;border:2px solid rgba(179,229,252,.5);border-radius:10px;font-size:.92em;background:rgba(255,255,255,.28);color:#01579b;outline:none;transition:border-color .2s}
-.f input:focus{border-color:#4fc3f7;background:rgba(255,255,255,.55)}
-.sl-list{max-height:180px;overflow-y:auto;border:1px solid rgba(179,229,252,.35);border-radius:12px;margin-bottom:8px;background:rgba(255,255,255,.15)}
-.si{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid rgba(179,229,252,.2);font-size:.85em}
-.si:last-child{border-bottom:none}.si.done{opacity:.45}
-.st-t{font-weight:600;color:#0277bd;min-width:48px}.st-a{color:#0288d1;opacity:.7;min-width:52px}
-.sb{margin-left:auto;padding:4px 9px;border:none;border-radius:8px;font-size:.76em;cursor:pointer}
-.sb-d{background:#4fc3f7;color:#fff}.sb-d:hover{background:#0288d1}
-.sb-u{background:rgba(225,245,254,.45);color:#0277bd}.sb-u:hover{background:#81d4fa}
-.btns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.btns button{flex:1;min-width:70px;padding:10px 6px;border:none;border-radius:12px;font-size:.85em;font-weight:600;cursor:pointer;transition:all .2s}
-.bp{background:linear-gradient(135deg,#4fc3f7,#0288d1);color:#fff;box-shadow:0 4px 14px rgba(2,136,209,.35)}
-.bp:hover{transform:translateY(-2px)}
-.bs{background:rgba(225,245,254,.38);color:#0277bd}.bs:hover{background:rgba(179,229,252,.6)}
-.bg2{background:transparent;color:#0288d1;border:1px solid rgba(179,229,252,.5)!important}.bg2:hover{background:rgba(179,229,252,.2)}
-.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-90px);padding:11px 20px;border-radius:14px;font-size:.9em;z-index:99;transition:transform .45s cubic-bezier(.34,1.56,.64,1);box-shadow:0 6px 24px rgba(0,0,0,.18);max-width:90vw;backdrop-filter:blur(8px)}
+.pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:700;color:#fff;font-size:1.15em;z-index:2;pointer-events:none;text-shadow:0 1px 6px rgba(3,68,110,.5);font-variant-numeric:tabular-nums}
+.stats{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:var(--sp3) var(--sp4)}
+.stat .sn{font-size:1.28rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .sn.small{font-size:1.02rem}
+.stat .sl{font-size:.68rem;color:var(--ink-3);margin-top:1px;font-weight:500}
+.st{font-size:.72rem;font-weight:700;color:var(--ink-2);letter-spacing:.08em;margin:var(--sp5) 0 var(--sp2);display:flex;align-items:center;gap:8px;text-transform:uppercase}
+.st::after{content:"";flex:1;height:1px;background:var(--card-line)}
+.row{display:flex;gap:var(--sp2);margin-bottom:var(--sp2)}
+.f{flex:1}.f label{display:block;font-size:.7rem;color:var(--ink-2);margin-bottom:4px;font-weight:600}
+.f input{width:100%;padding:9px 10px;border:1.5px solid var(--card-line);border-radius:var(--r-sm);font-size:.95rem;font-variant-numeric:tabular-nums;background:var(--field);color:var(--ink);outline:none;transition:border-color var(--t),box-shadow var(--t)}
+.f input:focus{border-color:var(--primary);box-shadow:var(--ring)}
+.tabs{display:flex;gap:4px;border-radius:var(--r-sm);overflow:hidden;margin-bottom:var(--sp3);background:var(--card-soft);padding:4px}
+.tab{flex:1;padding:8px;text-align:center;font-size:.8rem;font-weight:600;cursor:pointer;background:transparent;color:var(--ink-2);transition:all var(--t);border:none;border-radius:6px}
+.tab.on{background:var(--primary);color:#fff}
+@media(prefers-color-scheme:dark){.tab.on{color:#06283a}}
+.sl-list{max-height:184px;overflow-y:auto;border-radius:var(--r-md);margin-bottom:var(--sp3);background:var(--card-soft);scrollbar-width:thin}
+.si{display:flex;align-items:center;gap:var(--sp2);padding:8px 12px;border-bottom:1px solid var(--card-line);font-size:.85rem;min-height:44px}
+.si:last-child{border-bottom:none}.si.done{opacity:.4}
+.si.done .st-t{text-decoration:line-through}
+.st-t{font-weight:600;color:var(--ink);min-width:64px;font-variant-numeric:tabular-nums}.st-a{color:var(--ink-3);font-variant-numeric:tabular-nums}
+.sb{margin-left:auto;padding:7px 13px;border:none;border-radius:99px;font-size:.76rem;font-weight:600;cursor:pointer;transition:all var(--t)}
+.sb-d{background:var(--primary);color:#fff}
+@media(prefers-color-scheme:dark){.sb-d{color:#06283a}}
+.sb-d:hover{filter:brightness(1.12)}
+.sb-u{background:var(--card-soft);color:var(--ink-2)}.sb-u:hover{background:rgba(2,132,199,.16);color:var(--primary)}
+.btns{display:flex;gap:var(--sp2);margin-top:var(--sp3);flex-wrap:wrap}
+.btns button{flex:1;min-width:72px;min-height:44px;padding:10px 8px;border:none;border-radius:var(--r-md);font-size:.85rem;font-weight:600;cursor:pointer;transition:transform var(--t),filter var(--t),background var(--t);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btns button:active{transform:scale(.97)}
+.bp{background:var(--primary);color:#fff;flex:2}
+@media(prefers-color-scheme:dark){.bp{color:#06283a}}
+.bp:hover{filter:brightness(1.1)}
+.bs{background:var(--card-soft);color:var(--ink)}.bs:hover{background:rgba(2,132,199,.14)}
+.bg2{background:transparent;color:var(--ink-2);border:1.5px solid var(--card-line)!important}.bg2:hover{border-color:var(--primary)!important;color:var(--primary)}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-90px);padding:12px 22px;border-radius:14px;font-size:.9rem;z-index:99;transition:transform .45s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 28px rgba(0,20,40,.25);max-width:min(90vw,420px);backdrop-filter:blur(10px);font-weight:500}
 .toast.show{transform:translateX(-50%) translateY(0)}
-.ti{background:rgba(2,136,209,.9);color:#fff}.tw{background:rgba(239,108,0,.9);color:#fff}.td{background:rgba(46,125,50,.9);color:#fff}
-.hn{margin-top:12px;padding:9px 12px;background:rgba(255,243,224,.6);border-left:3px solid #ffb74d;border-radius:0 10px 10px 0;font-size:.76em;color:#e65100;line-height:1.5;display:none}
-.hn.show{display:block}
-.tabs{display:flex;gap:0;border-radius:10px;overflow:hidden;margin-bottom:10px;border:2px solid rgba(179,229,252,.4)}
-.tab{flex:1;padding:7px;text-align:center;font-size:.8em;font-weight:600;cursor:pointer;background:rgba(255,255,255,.22);color:#4fc3f7;transition:all .2s;border:none}
-.tab.on{background:#4fc3f7;color:#fff}
-/* Settings modal */
-.modal-bg{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+.ti{background:rgba(2,132,199,.94);color:#fff}.tw{background:rgba(180,83,9,.94);color:#fff}.td{background:rgba(21,128,61,.94);color:#fff}
+.note{margin-top:var(--sp3);padding:10px 14px;background:rgba(251,191,36,.14);border-radius:var(--r-md);font-size:.74rem;color:var(--warn);line-height:1.6;display:none}
+.note.show{display:block}
+.about{margin-top:var(--sp3);padding:12px 14px;background:var(--card-soft);border-radius:var(--r-md);font-size:.72rem;color:var(--ink-2);line-height:1.65}
+.about a{color:var(--primary);font-weight:600;text-underline-offset:2px}
+.about .st{margin-top:0}
+.modal-bg{position:fixed;inset:0;z-index:50;background:rgba(2,20,34,.45);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:16px}
 .modal-bg.show{display:flex}
-.modal{background:rgba(255,255,255,.80);backdrop-filter:blur(20px);border-radius:22px;padding:24px;max-width:380px;width:90%;max-height:88vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.2);border:1px solid rgba(144,202,249,.4)}
-.modal h2{font-size:1.05em;color:#01579b;margin-bottom:14px;text-align:center}
-.opt-group{margin-bottom:14px}
-.opt-group label{display:block;font-size:.78em;color:#0277bd;font-weight:600;margin-bottom:6px}
+.modal{background:var(--card);backdrop-filter:blur(22px) saturate(1.2);border-radius:var(--r-lg);padding:var(--sp5);max-width:400px;width:100%;max-height:88dvh;overflow-y:auto;box-shadow:var(--shadow);animation:pop .2s cubic-bezier(.22,1,.36,1);scrollbar-width:thin}
+@keyframes pop{from{transform:scale(.94) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal h2{font-size:1.05rem;color:var(--ink);margin-bottom:var(--sp4);text-align:center;font-weight:700;letter-spacing:-.01em}
+.opt-group{margin-bottom:var(--sp4)}
+.opt-group>label{display:block;font-size:.72rem;color:var(--ink-2);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:var(--sp2)}
 .opt-btns{display:flex;gap:6px;flex-wrap:wrap}
-.opt-btns button{padding:8px 14px;border:2px solid rgba(179,229,252,.5);border-radius:10px;font-size:.85em;cursor:pointer;background:rgba(255,255,255,.25);color:#0277bd;transition:all .2s}
-.opt-btns button.on{background:#4fc3f7;color:#fff;border-color:#4fc3f7}
+.opt-btns button,.lang-grid button{padding:9px 14px;min-height:40px;border:1.5px solid var(--card-line);border-radius:var(--r-sm);font-size:.85rem;font-weight:500;cursor:pointer;background:var(--card-soft);color:var(--ink);transition:all var(--t);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.opt-btns button:hover,.lang-grid button:hover{border-color:var(--primary);color:var(--primary)}
+.opt-btns button.on,.lang-grid button.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+@media(prefers-color-scheme:dark){.opt-btns button.on,.lang-grid button.on{color:#06283a}}
 .lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.lang-grid button{padding:9px;border:2px solid rgba(179,229,252,.5);border-radius:10px;font-size:.88em;cursor:pointer;background:rgba(255,255,255,.25);color:#0277bd;transition:all .2s}
-.lang-grid button.on{background:#4fc3f7;color:#fff;border-color:#4fc3f7}
-.modal .close-btn{width:100%;padding:10px;border:none;border-radius:12px;background:#0288d1;color:#fff;font-size:.9em;font-weight:600;cursor:pointer;margin-top:8px}
-.modal .close-btn:hover{background:#0277bd}
-.settings-btn{position:absolute;top:14px;right:14px;z-index:5;width:36px;height:36px;border:none;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1em;transition:all .2s;border:1px solid rgba(179,229,252,.4)}
-.settings-btn:hover{background:rgba(255,255,255,.45)}
-.about{margin-top:12px;padding:9px 12px;background:rgba(225,245,254,.22);border-left:3px solid #4fc3f7;border-radius:0 10px 10px 0;font-size:.72em;color:#0277bd;line-height:1.6}
-.about a{color:#0288d1;font-weight:600}
+.modal .close-btn{width:100%;min-height:44px;padding:11px;border:none;border-radius:var(--r-md);background:var(--primary);color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;margin-top:var(--sp2);transition:filter var(--t)}
+@media(prefers-color-scheme:dark){.modal .close-btn{color:#06283a}}
+.modal .close-btn:hover{filter:brightness(1.1)}
+.helper{font-size:.7rem;color:var(--ink-3);line-height:1.55;margin-top:var(--sp2)}
+.dm-drop{width:64px;height:64px;margin:0 auto 10px;border-radius:50%;background:rgba(2,132,199,.14);display:flex;align-items:center;justify-content:center;color:var(--primary)}
+.dm-drop .ic{width:34px;height:34px}
+.dm-drop.pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+#dmMl{font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -80,19 +134,25 @@ h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
 <div id="bgOv"></div>
 <div class="toast" id="toast"></div>
 <div class="app">
-<button class="settings-btn" onclick="window.open(location.href,'_blank')" style="right:56px;background:rgba(79,195,247,.3)" title="在新窗口打开">&#x2197;</button>
-<button class="settings-btn" onclick="openSettings()" id="btnSettings">&#x2699;&#xFE0F;</button>
-<h1 id="t_title">&#x1F4A7; 喝水提醒</h1>
+<header class="top">
+<div class="brand">
+<h1><svg class="ic" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg><span id="t_titleTxt">喝水提醒</span></h1>
 <p class="sub" id="t_sub">科学补水 · 自主掌控</p>
+</div>
+<div class="bj-pill" id="bjTime">--:--</div>
+<button class="icon-btn" onclick="window.open(location.href,'_blank')" title="在新窗口打开"><svg class="ic" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></button>
+<button class="icon-btn" onclick="openSettings()" id="btnSettings" title="设置"><svg class="ic" viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg></button>
+</header>
+<div class="hero">
 <div class="glass-wrap"><div class="glass"><div class="wb" id="waterBody"></div></div><div class="pct" id="pctLabel">0%</div></div>
 <div class="stats">
-<div><div class="sn" id="doneNum">0</div><div class="sl" id="l_done">已喝</div></div>
-<div><div class="sn" id="goalNum">8</div><div class="sl" id="l_goal">目标</div></div>
-<div><div class="sn" id="mlNum">0</div><div class="sl" id="l_ml">已喝(ml)</div></div>
-<div><div class="sn" id="nextTime">--:--</div><div class="sl" id="l_next">下次提醒</div></div>
-<div><div class="sn" id="bjTime" style="font-size:1em;">--:--</div><div class="sl">北京时间</div></div>
+<div class="stat"><div class="sn" id="doneNum">0</div><div class="sl" id="l_done">已喝</div></div>
+<div class="stat"><div class="sn" id="goalNum">8</div><div class="sl" id="l_goal">目标</div></div>
+<div class="stat"><div class="sn" id="mlNum">0</div><div class="sl" id="l_ml">已喝(ml)</div></div>
+<div class="stat"><div class="sn small" id="nextTime">--:--</div><div class="sl" id="l_next">下次提醒</div></div>
 </div>
-<div class="st" id="t_settings">&#x2699;&#xFE0F; 设置</div>
+</div>
+<div class="st" id="t_settings">设置</div>
 <div class="row">
 <div class="f"><label id="l_goalIn">每日目标（杯）</label><input type="number" id="goalInput" min="1" max="20" value="8" onchange="onGoalChange()"></div>
 <div class="f"><label id="l_cupMl">每杯容量（ml）</label><input type="number" id="cupMl" min="50" max="1000" value="250" onchange="updateDisplay();renderSchedule()"></div>
@@ -101,7 +161,7 @@ h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
 <div class="f"><label id="l_start">开始时间</label><input type="time" id="startT" value="08:00" onchange="onScheduleChange()"></div>
 <div class="f"><label id="l_end">结束时间</label><input type="time" id="endT" value="22:00" onchange="onScheduleChange()"></div>
 </div>
-<div class="st" id="t_sched">&#x23F0; 时间安排</div>
+<div class="st" id="t_sched">时间安排</div>
 <div class="tabs" style="margin-bottom:8px;">
 <button class="tab on" id="tabDaily" onclick="setDateMode(0)">每日循环</button>
 <button class="tab" id="tabOnce" onclick="setDateMode(1)">指定日期</button>
@@ -115,21 +175,21 @@ h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
 </div>
 <div id="autoPanel" style="display:none">
 <div class="row"><div class="f"><label id="l_freq">频率（分钟/次）</label><input type="number" id="freqMin" min="5" max="240" value="105" onchange="autoDistribute()"></div></div>
-<button class="bs btns" style="width:100%" onclick="autoDistribute()">&#x21BB; <span id="l_redist">重新分配</span></button>
+<button class="bs btns" style="width:100%" onclick="autoDistribute()"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> <span id="l_redist">重新分配</span></button>
 </div>
 <div id="manualPanel"><div style="font-size:.76em;color:#0288d1;opacity:.65;margin-bottom:6px;" id="l_manualHint">点击添加时间点或用均分微调</div></div>
 <div class="sl-list" id="schedList"></div>
 <div class="btns">
-<button class="bp" onclick="addSlot()">&#xFF0B; <span id="l_add">添加</span></button>
-<button class="bs" onclick="startReminders()">&#x25B6; <span id="l_startBtn">开始</span></button>
-<button class="bs" onclick="stopReminders()">&#x23F8; <span id="l_pause">暂停</span></button>
-<button class="bg2" onclick="resetAll()">&#x21BB; <span id="l_reset">重置</span></button>
-<button class="bg2" onclick="exportICS()">&#x1F4C5; <span id="l_export">导出日历</span></button>
-<button class="bg2" onclick="shareCfg()">&#x1F517; <span id="l_sync">同步</span></button>
+<button class="bp" onclick="startReminders()"><svg class="ic" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg><span id="l_startBtn">开始</span></button>
+<button class="bs" onclick="stopReminders()"><svg class="ic" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg><span id="l_pause">暂停</span></button>
+<button class="bs" onclick="addSlot()"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span id="l_add">添加</span></button>
+<button class="bg2" onclick="resetAll()"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span id="l_reset">重置</span></button>
+<button class="bg2" onclick="exportICS()"><svg class="ic" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg><span id="l_export">导出日历</span></button>
+<button class="bg2" onclick="shareCfg()"><svg class="ic" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span id="l_sync">同步</span></button>
 </div>
-<div class="hn" id="healthNote"></div>
+<div class="note" id="healthNote"></div>
 <div class="about">
-<div class="st" id="t_about">&#x2139;&#xFE0F; 来源与许可</div>
+<div class="st" id="t_about">来源与许可</div>
 <div id="aMusic" style="margin-bottom:4px"></div>
 <div id="aImg"></div>
 </div>
@@ -137,42 +197,42 @@ h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
 
 <div class="modal-bg" id="settingsModal">
 <div class="modal">
-<h2 id="t_settingsTitle">&#x2699;&#xFE0F; 设置</h2>
-<div class="opt-group"><label id="l_method">&#x1F50A; 提醒方式</label>
+<h2 id="t_settingsTitle">设置</h2>
+<div class="opt-group"><label id="l_method">提醒方式</label>
 <div class="opt-btns">
-<button id="mMusic" class="on" onclick="setMethod(0)">&#x1F3B5; 音乐</button>
-<button id="mVibrate" onclick="setMethod(1)">&#x1F4F3; 震动</button>
-<button id="mSilent" onclick="setMethod(2)">&#x1F507; 静音</button>
+<button id="mMusic" class="on" onclick="setMethod(0)"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>音乐</span></button>
+<button id="mVibrate" onclick="setMethod(1)"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>震动</span></button>
+<button id="mSilent" onclick="setMethod(2)"><svg class="ic" viewBox="0 0 24 24"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg><span>静音</span></button>
 </div></div>
-<div class="opt-group"><label id="l_musicStyle">&#x1F3B5; 音乐风格</label>
+<div class="opt-group"><label id="l_musicStyle">音乐风格</label>
 <div class="opt-btns">
-<button id="msB0" class="on" onclick="setMusicStyle(0)">&#x1F4A7; 轻柔</button>
-<button id="msB1" onclick="setMusicStyle(1)">&#x2728; 活泼</button>
-<button id="msB2" onclick="setMusicStyle(2)">&#x1F9D8; 冥想</button>
-<button id="msB3" onclick="setMusicStyle(3)">&#x1F30A; 流水</button>
-<button id="msB4" onclick="setMusicStyle(4)">&#x1F3B5; 歌曲</button>
+<button id="msB0" class="on" onclick="setMusicStyle(0)">轻柔</button>
+<button id="msB1" onclick="setMusicStyle(1)">活泼</button>
+<button id="msB2" onclick="setMusicStyle(2)">冥想</button>
+<button id="msB3" onclick="setMusicStyle(3)">流水</button>
+<button id="msB4" onclick="setMusicStyle(4)">歌曲</button>
 </div></div>
-<div class="opt-group"><label id="l_durGrp">&#x23F1; 提醒时长</label>
+<div class="opt-group"><label id="l_durGrp">提醒时长</label>
 <div class="opt-btns">
 <button id="durB0" onclick="setRemindDur(0)">10 秒</button>
 <button id="durB1" onclick="setRemindDur(1)">20 秒</button>
 <button id="durB2" class="on" onclick="setRemindDur(2)">30 秒</button>
 </div>
 <div class="opt-btns" style="margin-top:8px">
-<button id="btnFullPlay" onclick="fullPlay()" style="width:100%">&#x25B6; <span id="l_fullPlay">完整试听（按所选时长播放）</span></button>
+<button id="btnFullPlay" onclick="fullPlay()" style="width:100%"><svg class="ic" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg><span id="l_fullPlay">完整试听（按所选时长播放）</span></button>
 </div></div>
-<div class="opt-group"><label id="l_calTest">&#x1F4C5; 日历提醒</label>
+<div class="opt-group"><label id="l_calTest">日历提醒</label>
 <div class="opt-btns">
-<button id="btnTestIcs" onclick="exportTestICS()" style="width:100%">&#x1F9EA; <span id="l_testIcs">测试提醒（2分钟后）</span></button>
-<div style="font-size:.7em;color:#0288d1;opacity:.8;line-height:1.5;margin-top:8px" id="l_calNote"></div>
+<button id="btnTestIcs" onclick="exportTestICS()" style="width:100%"><svg class="ic" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg><span id="l_testIcs">测试提醒（2分钟后）</span></button>
+<div class="helper" id="l_calNote"></div>
 </div></div>
-<div class="opt-group"><label id="l_notifGrp">&#x1F514; 系统通知</label>
+<div class="opt-group"><label id="l_notifGrp">系统通知</label>
 <div class="opt-btns">
-<button id="btnNotif" onclick="reqNotif()" style="width:100%">&#x1F514; 开启系统通知</button>
+<button id="btnNotif" onclick="reqNotif()" style="width:100%"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="l_notifBtn">开启系统通知</span></button>
 </div>
-<div style="font-size:.7em;color:#0288d1;opacity:.8;line-height:1.5;margin-top:8px" id="l_notifNote"></div>
+<div class="helper" id="l_notifNote"></div>
 </div></div>
-<div class="opt-group"><label id="l_lang">&#x1F310; 语言</label>
+<div class="opt-group"><label id="l_lang">语言</label>
 <div class="lang-grid">
 <button id="lgZh" class="on" onclick="setLang('zh')">中文</button>
 <button id="lgEn" onclick="setLang('en')">English</button>
@@ -184,12 +244,12 @@ h1{font-size:1.3em;color:#01579b;text-align:center;margin-bottom:2px}
 
 <div class="modal-bg" id="drinkModal">
 <div class="modal" style="text-align:center">
-<div style="font-size:2.8em;line-height:1;margin-bottom:8px">&#x1F4A7;</div>
-<h2 id="dmTitle" style="margin-bottom:4px">&#x26A0;&#xFE0F; 到点了！该喝水了</h2>
-<div id="dmCup" style="font-size:.85em;color:#0288d1;margin-bottom:4px">第 1 / 8 杯</div>
-<div id="dmMl" style="font-size:2em;font-weight:700;color:#0277bd;margin:6px 0 12px">250 ml</div>
-<button class="bp" id="dmSip" style="width:100%;padding:12px;font-size:1em;margin-bottom:8px" onclick="confirmDrink()">&#x1F4A7; 喝了</button>
-<button class="bg2" id="dmSnooze" style="width:100%;padding:10px" onclick="snoozeDrink()">&#x23F0; 稍后 10 分钟</button>
+<div class="dm-drop pulse"><svg class="ic" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg></div>
+<h2 id="dmTitle" style="margin-bottom:4px">到点了！该喝水了</h2>
+<div id="dmCup" style="font-size:.85rem;color:var(--ink-2);margin-bottom:4px">第 1 / 8 杯</div>
+<div id="dmMl" style="font-size:2rem;font-weight:700;color:var(--ink);margin:6px 0 14px">250 ml</div>
+<button class="bp" id="dmSip" style="width:100%;padding:13px;font-size:1rem;margin-bottom:8px" onclick="confirmDrink()">喝了</button>
+<button class="bg2" id="dmSnooze" style="width:100%;padding:10px" onclick="snoozeDrink()">稍后 10 分钟</button>
 </div></div>
 <script>
 /* Audio: 水滴声开场 + 多风格环境音乐主体（Web Audio API 实时程序合成，CC0） */
@@ -270,6 +330,32 @@ src.start(t0+.35);src.stop(t0+total+.2);
 liveOsc.push(src)})}
 function notify(){if(method===0)playReminder(false);else if(method===1&&navigator.vibrate)navigator.vibrate([200,100,200,100,300])}
 
+/* Native alarm bridge (Android App): 息屏精确闹钟 */
+function nativeAlarm(op){
+try{
+var cap=window.Capacitor;
+if(!cap||!cap.Plugins||!cap.Plugins.WaterAlarm)return;
+var W=cap.Plugins.WaterAlarm;
+if(op==="set"){
+var t=[];
+for(var i=0;i<slots.length;i++){if(!done[i])t.push(slots[i])}
+W.setAlarms({times:t,ringSec:remindSec});
+}else{W.cancelAlarms({})}
+}catch(x){}}
+function nativeSetup(){
+try{
+var cap=window.Capacitor;
+if(!cap||!cap.Plugins||!cap.Plugins.WaterAlarm)return;
+var W=cap.Plugins.WaterAlarm;
+W.reqNotif({});
+W.checkExact({}).then(function(r){
+if(!r.allowed){toast(t("exactPerm"),"w",9000);W.openExactSettings({})}
+});
+}catch(x){}}
+document.addEventListener('visibilitychange',function(){
+if(document.hidden){if(running)nativeAlarm("set")}
+else{nativeAlarm("cancel")}});
+
 /* PWA: service worker + system notifications */
 var swReg=null,notifOK=false;
 function initSW(){if(!('serviceWorker' in navigator))return;
@@ -289,7 +375,7 @@ if(notifOK){toast(t('notifOn'),"d",6000);sysNotify(t('title'),t('notifTest'))}
 else toast(t('notifDeny'),"w",6000)})}
 function updateNotifUI(){
 try{if('Notification' in window)notifOK=(Notification.permission==='granted')}catch(e){}
-var b=$("btnNotif");if(b)b.textContent=(notifOK?"\u2705 ":"\uD83D\uDD14 ")+t('reqNotif')}
+var b=$("btnNotif");if(b){var s=b.querySelector("span");if(s)s.textContent=(notifOK?"\u2705 ":"")+t('reqNotif')}}
 function sysNotify(title,body){
 if(!notifOK)return;
 try{
@@ -299,10 +385,10 @@ else if('Notification' in window){new Notification(title,{body:body,icon:'icon-1
 
 /* i18n */
 var I18N={
-zh:{title:"\uD83D\uDCA7 喝水提醒",sub:"科学补水 · 自主掌控",done:"已喝",goal:"目标",ml:"已喝(ml)",next:"下次提醒",settings:"设置",goalIn:"每日目标（杯）",cupMl:"每杯容量（ml）",start:"开始时间",end:"结束时间",sched:"时间安排",manual:"自定义",auto:"均分",freq:"频率（分钟/次）",redist:"重新分配",manualHint:"点击添加时间点或用均分微调",add:"添加",startBtn:"开始",pause:"暂停",reset:"重置",method:"提醒方式",music:"音乐",vibrate:"震动",silent:"静音",lang:"语言",close:"确定",drinkBtn:"喝了",undo:"撤销",goalDone:"\uD83C\uDF89 今日目标已达成！",reminderOn:"\u2705 提醒已开启",resetMsg:"\u21BB 已重置",timeUp:"\u26A0\uFE0F 到点了！该喝水了",healthHigh:"\u26A0\uFE0F 今日已饮水 {ml} ml，短时间内大量饮水可能导致低钠血症。请根据身体需要适量饮用，不必强求达标。",healthNear:"\uD83D\uDC4D 已接近目标！身体感到口渴再喝即可，不必勉强。",settingsTitle:"\u2699\uFE0F 设置",musicStyle:"音乐风格",ms0:"轻柔",ms1:"活泼",ms2:"冥想",ms3:"流水",ms4:"歌曲",about:"来源与许可",aboutMusic:"🎵 音乐：Web Audio API 实时程序合成（水滴声开场＋多风格旋律），另含用户提供的歌曲 music.mp3（版权归原权利人，仅供个人使用，请勿二次分发）。来源：内置合成引擎 / 用户提供 · 许可证 ",aboutImage:"🖼️ 封面图：水滴入水激起涟漪照片 · 来源：用户提供 · 仅供个人非商业使用",cupOf:"第 {n} / {g} 杯",snoozeBtn:"稍后 10 分钟",exportBtn:"导出日历",icsTitle:"喝水提醒 第 {n} / {g} 杯",icsDesc:"到点了，喝一杯 {ml} ml 的水",exported:"📅 已导出 water-reminder.ics，请在日历 App 中导入使用",calTest:"日历提醒",testIcs:"测试提醒（2分钟后）",testExported:"已导出测试事件（2分钟后触发）。导入日历后留意系统通知，可验证提醒链路",calNote:"💡 日历提醒的声音/震动请在手机系统设置的「日历」App 通知中开启；网页开着时用网页音乐提醒",notifGrp:"系统通知",reqNotif:"开启系统通知",notifOn:"✅ 系统通知已开启，页面在后台也能弹提醒",notifDeny:"通知权限被拒绝，请在浏览器地址栏权限设置中允许",notifNoSvc:"当前环境不支持系统通知，请用 Chrome/Edge 打开",notifTest:"通知已就绪 💧",notifNote:"💡 开启后页面最小化/后台（电脑）也会弹系统通知；完全关闭页面仍需日历兜底",sync:"同步",syncCopied:"🔗 配置链接已复制！发给手机/其他设备打开即自动套用",syncApplied:"✅ 已套用分享链接里的配置",durGrp:"提醒时长",dur0:"10 秒",dur1:"20 秒",dur2:"30 秒",fullPlay:"完整试听（按所选时长播放）",fullPlayTip:"⏳ 正在按当前设置播放完整提醒；点任意音乐风格或“暂停”可随时停止"},
-en:{title:"\uD83D\uDCA7 Water Reminder",sub:"Stay hydrated · Stay healthy",done:"Drunk",goal:"Goal",ml:"Drunk(ml)",next:"Next",settings:"Settings",goalIn:"Daily goal (cups)",cupMl:"Cup size (ml)",start:"Start time",end:"End time",sched:"Schedule",manual:"Custom",auto:"Auto",freq:"Frequency (min)",redist:"Redistribute",manualHint:"Add time points or use auto-distribute",add:"Add",startBtn:"Start",pause:"Pause",reset:"Reset",method:"Reminder method",music:"Music",vibrate:"Vibrate",silent:"Silent",lang:"Language",close:"OK",drinkBtn:"Drink",undo:"Undo",goalDone:"\uD83C\uDF89 Daily goal achieved!",reminderOn:"\u2705 Reminders on",resetMsg:"\u21BB Reset",timeUp:"\u26A0\uFE0F Time to drink water!",healthHigh:"\u26A0\uFE0F You've had {ml} ml today. Drinking too much water in a short time may cause hyponatremia. Listen to your body.",healthNear:"\uD83D\uDC4D Almost there! Drink when you feel thirsty, no need to force it.",settingsTitle:"\u2699\uFE0F Settings",musicStyle:"Music style",ms0:"Gentle",ms1:"Lively",ms2:"Meditate",ms3:"Stream",ms4:"Song",about:"Sources & licenses",aboutMusic:"🎵 Music: real-time Web Audio synthesis (water-drop intro + multi-style melodies); plus user-provided song music.mp3 (personal use only, do not redistribute). Source: built-in synth / user-provided · License ",aboutImage:"🖼️ Cover photo: water drop ripples · Source: provided by user · personal non-commercial use only",cupOf:"Cup {n} of {g}",snoozeBtn:"Snooze 10 min",exportBtn:"Export .ics",icsTitle:"Water reminder cup {n}/{g}",icsDesc:"Time to drink a cup of water ({ml} ml)",exported:"📅 Exported water-reminder.ics — import it into your calendar app",calTest:"Calendar alerts",testIcs:"Test alert (in 2 min)",testExported:"Test event exported (fires in 2 min). Import it to verify calendar notifications",calNote:"💡 Enable sound/vibration for the Calendar app in your phone's system notification settings. Keep this page open for music reminders",notifGrp:"System notifications",reqNotif:"Enable notifications",notifOn:"✅ Notifications on — reminders fire even in background",notifDeny:"Permission denied. Allow notifications from the browser address bar",notifNoSvc:"Notifications unsupported here — open in Chrome/Edge",notifTest:"Notifications ready 💧",notifNote:"💡 With notifications on, minimized/background tabs (desktop) still alert. Closed pages still need the calendar fallback",sync:"Sync",syncCopied:"🔗 Config link copied! Open it on your phone/another device to apply",syncApplied:"✅ Applied the shared config",durGrp:"Reminder length",dur0:"10s",dur1:"20s",dur2:"30s",fullPlay:"Full preview (plays selected length)",fullPlayTip:"⏳ Playing a full reminder with current settings; click any music style or Pause to stop"},
-ko:{title:"\uD83D\uDCA7 \uC218 \uB9C8\uC2DC\uAE30 \uC54C\uB9BC",sub:"\uAC74\uAC15\uD55C \uC218\uBD84 \uBCF4\uCD95",done:"\uB9C8\uC2E0",goal:"\uBAA9\uD45C",ml:"\uB9C8\uC2E0(ml)",next:"\uB2E4\uC74C",settings:"\uC124\uC815",goalIn:"\uC77C\uC77C \uBAA9\uD45C（\uCEF5）",cupMl:"\uCEF5 \uC6A9\uB7C9（ml）",start:"\uC2DC\uC791 \uC2DC\uAC04",end:"\uC885\uB8CC \uC2DC\uAC04",sched:"\uC2A4\uCF00\uC904",manual:"\uC9C1\uC811",auto:"\uC790\uB3D9",freq:"\uBE48\uB3C4（\uBD84）",redist:"\uB2E4\uC2DC \uBC30\uCE58",manualHint:"\uC2DC\uAC04\uC744 \uCD94\uAC00\uD558\uAC70\uB098 \uC790\uB3D9 \uBD84\uBC30 \uC0AC\uC6A9",add:"\uCD94\uAC00",startBtn:"\uC2DC\uC791",pause:"\uC77C\uC2DC\uC815\uC9C0",reset:"\uCD08\uAE30\uD654",method:"\uC54C\uB9BC \uBC29\uBC95",music:"\uC74C\uC545",vibrate:"\uC9C4\uB3D9",silent:"\uBB34\uC74C",lang:"\uC5B8\uC5B4",close:"\uD655\uC778",drinkBtn:"\uB9C8\uC2E4",undo:"\uCDE8\uC18C",goalDone:"\uD83C\uDF89 \uBAA9\uD45C \uB2EC\uC131!",reminderOn:"\u2705 \uC54C\uB9BC \uC2DC\uC791",resetMsg:"\u21BB \uCD08\uAE30\uD654\uB428",timeUp:"\u26A0\uFE0F \uC218 \uB9C8\uC2EC \uC2DC\uAC04!",healthHigh:"\u26A0\uFE0F \uC624\uB298 {ml}ml\uB97C \uB9C8\uC168\uC2B5\uB2C8\uB2E4. \uB108\uBB34 \uB9CE\uC774 \uB9C8\uC2DC\uBA74 \uC800\uB098\uD2B8\uB9D8 \uC99D\uC774 \uC788\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",healthNear:"\uD83D\uDC4D \uAC70\uC758 \uB2E4\uB410\uC2B5\uB2C8\uB2E4! \uAC08\uC99D\uC5D0 \uB9C8\uC2DC\uBA74 \uB429\uB2C8\uB2E4.",settingsTitle:"\u2699\uFE0F \uC124\uC815",musicStyle:"음악 스타일",ms0:"부드러운",ms1:"경쾌한",ms2:"명상",ms3:"물소리",ms4:"노래",about:"출처 및 라이선스",aboutMusic:"🎵 음악: Web Audio API 실시간 합성(물방울 인트로 + 다양한 스타일) 및 사용자 제공 곡 music.mp3(개인용, 재배포 금지). 출처: 내장 신디사이저 / 사용자 제공 · 라이선스 ",aboutImage:"🖼️ 표지 사진: 물방울 물결 · 출처: 사용자 제공 · 개인 비상업적 용도로만 사용",cupOf:"{g}잔 중 {n}번째",snoozeBtn:"10분 후 알림",exportBtn:"달력 내보내기",icsTitle:"물 마시기 {g}잔 중 {n}번째",icsDesc:"물 한 잔({ml}ml) 마실 시간이에요",exported:"📅 water-reminder.ics 내보냈어요 — 달력 앱에 가져가세요",calTest:"달력 알림",testIcs:"테스트 알림(2분 후)",testExported:"테스트 일정을 내보냈어요(2분 후). 달력 알림을 확인하세요",calNote:"💡 달력 알림의 소리/진동은 휴대폰 시스템 설정의 달력 앱 알림에서 켜세요. 페이지를 열어두면 음악 알림이 작동해요",notifGrp:"시스템 알림",reqNotif:"알림 켜기",notifOn:"✅ 알림이 켜졌어요 — 백그라운드에서도 알려줘요",notifDeny:"권한이 거부되었어요. 브라우저 주소창 권한 설정에서 허용해 주세요",notifNoSvc:"이 환경은 알림을 지원하지 않아요 — Chrome/Edge로 열어 주세요",notifTest:"알림 준비 완료 💧",notifNote:"💡 알림을 켜면 최소화/백그라운드(PC)에서도 알림이 와요. 완전히 닫으면 달력이 필요해요",sync:"동기화",syncCopied:"🔗 설정 링크를 복사했어요! 휴대폰에서 열면 자동 적용돼요",syncApplied:"✅ 공유된 설정을 적용했어요",durGrp:"알림 길이",dur0:"10초",dur1:"20초",dur2:"30초",fullPlay:"전체 미리듣기(선택 길이)",fullPlayTip:"⏳ 현재 설정으로 전체 알림 재생 중; 음악 스타일 또는 일시정지를 누르면 멈춰요"},
-fr:{title:"\uD83D\uDCA7 Rappel d'hydratation",sub:"Restez hydrat\u00E9 · Restez en sant\u00E9",done:"Bu",goal:"Objectif",ml:"Bu(ml)",next:"Prochain",settings:"Param\u00E8tres",goalIn:"Objectif (verres)",cupMl:"Taille (ml)",start:"Heure d\u00E9but",end:"Heure fin",sched:"Planification",manual:"Manuel",auto:"Auto",freq:"Fr\u00E9quence (min)",redist:"Redistribuer",manualHint:"Ajoutez des moments ou utilisez l'auto",add:"Ajouter",startBtn:"D\u00E9marrer",pause:"Pause",reset:"R\u00E9initialiser",method:"M\u00E9thode",music:"Musique",vibrate:"Vibrer",silent:"Silencieux",lang:"Langue",close:"OK",drinkBtn:"Bu",undo:"Annuler",goalDone:"\uD83C\uDF89 Objectif atteint !",reminderOn:"\u2705 Rappels activ\u00E9s",resetMsg:"\u21BB R\u00E9initialis\u00E9",timeUp:"\u26A0\uFE0F C'est l'heure de boire !",healthHigh:"\u26A0\uFE0F Vous avez bu {ml} ml aujourd'hui. Trop d'eau en peu de temps peut causer une hyponatr\u00E9mie. \u00C9coutez votre corps.",healthNear:"\uD83D\uDC4D Presque l\u00E0 ! Buvez quand vous avez soif, pas besoin de forcer.",settingsTitle:"\u2699\uFE0F Param\u00E8tres",musicStyle:"Style musical",ms0:"Doux",ms1:"Vif",ms2:"Méditation",ms3:"Ruisseau",ms4:"Chanson",about:"Sources et licences",aboutMusic:"🎵 Musique : synthèse Web Audio temps réel (intro goutte d'eau + mélodies variées) ; plus le morceau fourni music.mp3 (usage personnel uniquement, ne pas redistribuer). Source : moteur intégré / fourni par l'utilisateur · Licence : ",aboutImage:"🖼️ Photo de couverture : goutte d'eau et ondulations · Source : fournie par l'utilisateur · usage personnel non commercial uniquement",cupOf:"Verre {n} sur {g}",snoozeBtn:"Plus tard (10 min)",exportBtn:"Exporter .ics",icsTitle:"Rappel hydratation {n}/{g}",icsDesc:"C'est l'heure de boire un verre ({ml} ml)",exported:"📅 water-reminder.ics exporté — importez-le dans votre app calendrier",calTest:"Alertes calendrier",testIcs:"Test (dans 2 min)",testExported:"Événement test exporté (dans 2 min). Importez-le pour vérifier les notifications",calNote:"💡 Activez son/vibration de l'app Calendrier dans les notifications système. Gardez la page ouverte pour la musique",notifGrp:"Notifications système",reqNotif:"Activer les notifications",notifOn:"✅ Notifications activées — alertes même en arrière-plan",notifDeny:"Permission refusée. Autorisez les notifications depuis la barre d'adresse",notifNoSvc:"Notifications non prises en charge ici — ouvrez avec Chrome/Edge",notifTest:"Notifications prêtes 💧",notifNote:"💡 Une fois activées, les fenêtres réduites/arrière-plan (PC) reçoivent des alertes. Page fermée = calendrier requis",sync:"Synchroniser",syncCopied:"🔗 Lien de config copié ! Ouvrez-le sur votre téléphone pour l'appliquer",syncApplied:"✅ Config partagée appliquée",durGrp:"Durée du rappel",dur0:"10s",dur1:"20s",dur2:"30s",fullPlay:"Aperçu complet (durée choisie)",fullPlayTip:"⏳ Lecture complète selon vos réglages ; cliquez un style ou Pause pour arrêter"}
+zh:{title:"喝水提醒",sub:"科学补水 · 自主掌控",done:"已喝",goal:"目标",ml:"已喝(ml)",next:"下次提醒",settings:"设置",goalIn:"每日目标（杯）",cupMl:"每杯容量（ml）",start:"开始时间",end:"结束时间",sched:"时间安排",manual:"自定义",auto:"均分",freq:"频率（分钟/次）",redist:"重新分配",manualHint:"点击添加时间点或用均分微调",add:"添加",startBtn:"开始",pause:"暂停",reset:"重置",method:"提醒方式",music:"音乐",vibrate:"震动",silent:"静音",lang:"语言",close:"确定",drinkBtn:"喝了",undo:"撤销",goalDone:"\uD83C\uDF89 今日目标已达成！",reminderOn:"\u2705 提醒已开启",resetMsg:"\u21BB 已重置",timeUp:"\u26A0\uFE0F 到点了！该喝水了",healthHigh:"\u26A0\uFE0F 今日已饮水 {ml} ml，短时间内大量饮水可能导致低钠血症。请根据身体需要适量饮用，不必强求达标。",healthNear:"\uD83D\uDC4D 已接近目标！身体感到口渴再喝即可，不必勉强。",settingsTitle:"\u2699\uFE0F 设置",musicStyle:"音乐风格",ms0:"轻柔",ms1:"活泼",ms2:"冥想",ms3:"流水",ms4:"歌曲",about:"来源与许可",aboutMusic:"🎵 音乐：Web Audio API 实时程序合成（水滴声开场＋多风格旋律），另含用户提供的歌曲 music.mp3（版权归原权利人，仅供个人使用，请勿二次分发）。来源：内置合成引擎 / 用户提供 · 许可证 ",aboutImage:"🖼️ 封面图：水滴入水激起涟漪照片 · 来源：用户提供 · 仅供个人非商业使用",cupOf:"第 {n} / {g} 杯",snoozeBtn:"稍后 10 分钟",exportBtn:"导出日历",icsTitle:"喝水提醒 第 {n} / {g} 杯",icsDesc:"到点了，喝一杯 {ml} ml 的水",exported:"📅 已导出 water-reminder.ics，请在日历 App 中导入使用",calTest:"日历提醒",testIcs:"测试提醒（2分钟后）",testExported:"已导出测试事件（2分钟后触发）。导入日历后留意系统通知，可验证提醒链路",calNote:"💡 日历提醒的声音/震动请在手机系统设置的「日历」App 通知中开启；网页开着时用网页音乐提醒",notifGrp:"系统通知",reqNotif:"开启系统通知",notifOn:"✅ 系统通知已开启，页面在后台也能弹提醒",notifDeny:"通知权限被拒绝，请在浏览器地址栏权限设置中允许",notifNoSvc:"当前环境不支持系统通知，请用 Chrome/Edge 打开",notifTest:"通知已就绪 💧",notifNote:"💡 开启后页面最小化/后台（电脑）也会弹系统通知；完全关闭页面仍需日历兜底",sync:"同步",syncCopied:"🔗 配置链接已复制！发给手机/其他设备打开即自动套用",syncApplied:"✅ 已套用分享链接里的配置",exactPerm:"⚠️ 请在系统设置中允许“闹钟和提醒”权限，否则无法息屏提醒",durGrp:"提醒时长",dur0:"10 秒",dur1:"20 秒",dur2:"30 秒",fullPlay:"完整试听（按所选时长播放）",fullPlayTip:"⏳ 正在按当前设置播放完整提醒；点任意音乐风格或“暂停”可随时停止"},
+en:{title:"Water Reminder",sub:"Stay hydrated · Stay healthy",done:"Drunk",goal:"Goal",ml:"Drunk(ml)",next:"Next",settings:"Settings",goalIn:"Daily goal (cups)",cupMl:"Cup size (ml)",start:"Start time",end:"End time",sched:"Schedule",manual:"Custom",auto:"Auto",freq:"Frequency (min)",redist:"Redistribute",manualHint:"Add time points or use auto-distribute",add:"Add",startBtn:"Start",pause:"Pause",reset:"Reset",method:"Reminder method",music:"Music",vibrate:"Vibrate",silent:"Silent",lang:"Language",close:"OK",drinkBtn:"Drink",undo:"Undo",goalDone:"\uD83C\uDF89 Daily goal achieved!",reminderOn:"\u2705 Reminders on",resetMsg:"\u21BB Reset",timeUp:"\u26A0\uFE0F Time to drink water!",healthHigh:"\u26A0\uFE0F You've had {ml} ml today. Drinking too much water in a short time may cause hyponatremia. Listen to your body.",healthNear:"\uD83D\uDC4D Almost there! Drink when you feel thirsty, no need to force it.",settingsTitle:"\u2699\uFE0F Settings",musicStyle:"Music style",ms0:"Gentle",ms1:"Lively",ms2:"Meditate",ms3:"Stream",ms4:"Song",about:"Sources & licenses",aboutMusic:"🎵 Music: real-time Web Audio synthesis (water-drop intro + multi-style melodies); plus user-provided song music.mp3 (personal use only, do not redistribute). Source: built-in synth / user-provided · License ",aboutImage:"🖼️ Cover photo: water drop ripples · Source: provided by user · personal non-commercial use only",cupOf:"Cup {n} of {g}",snoozeBtn:"Snooze 10 min",exportBtn:"Export .ics",icsTitle:"Water reminder cup {n}/{g}",icsDesc:"Time to drink a cup of water ({ml} ml)",exported:"📅 Exported water-reminder.ics — import it into your calendar app",calTest:"Calendar alerts",testIcs:"Test alert (in 2 min)",testExported:"Test event exported (fires in 2 min). Import it to verify calendar notifications",calNote:"💡 Enable sound/vibration for the Calendar app in your phone's system notification settings. Keep this page open for music reminders",notifGrp:"System notifications",reqNotif:"Enable notifications",notifOn:"✅ Notifications on — reminders fire even in background",notifDeny:"Permission denied. Allow notifications from the browser address bar",notifNoSvc:"Notifications unsupported here — open in Chrome/Edge",notifTest:"Notifications ready 💧",notifNote:"💡 With notifications on, minimized/background tabs (desktop) still alert. Closed pages still need the calendar fallback",sync:"Sync",syncCopied:"🔗 Config link copied! Open it on your phone/another device to apply",syncApplied:"✅ Applied the shared config",exactPerm:"⚠️ Please allow \"Alarms & reminders\" in system settings, otherwise no screen-off alerts",durGrp:"Reminder length",dur0:"10s",dur1:"20s",dur2:"30s",fullPlay:"Full preview (plays selected length)",fullPlayTip:"⏳ Playing a full reminder with current settings; click any music style or Pause to stop"},
+ko:{title:"물 마시기 알림",sub:"건강한 수분 보충",done:"\uB9C8\uC2E0",goal:"\uBAA9\uD45C",ml:"\uB9C8\uC2E0(ml)",next:"\uB2E4\uC74C",settings:"\uC124\uC815",goalIn:"\uC77C\uC77C \uBAA9\uD45C（\uCEF5）",cupMl:"\uCEF5 \uC6A9\uB7C9（ml）",start:"\uC2DC\uC791 \uC2DC\uAC04",end:"\uC885\uB8CC \uC2DC\uAC04",sched:"\uC2A4\uCF00\uC904",manual:"\uC9C1\uC811",auto:"\uC790\uB3D9",freq:"\uBE48\uB3C4（\uBD84）",redist:"\uB2E4\uC2DC \uBC30\uCE58",manualHint:"\uC2DC\uAC04\uC744 \uCD94\uAC00\uD558\uAC70\uB098 \uC790\uB3D9 \uBD84\uBC30 \uC0AC\uC6A9",add:"\uCD94\uAC00",startBtn:"\uC2DC\uC791",pause:"\uC77C\uC2DC\uC815\uC9C0",reset:"\uCD08\uAE30\uD654",method:"\uC54C\uB9BC \uBC29\uBC95",music:"\uC74C\uC545",vibrate:"\uC9C4\uB3D9",silent:"\uBB34\uC74C",lang:"\uC5B8\uC5B4",close:"\uD655\uC778",drinkBtn:"\uB9C8\uC2E4",undo:"\uCDE8\uC18C",goalDone:"\uD83C\uDF89 \uBAA9\uD45C \uB2EC\uC131!",reminderOn:"\u2705 \uC54C\uB9BC \uC2DC\uC791",resetMsg:"\u21BB \uCD08\uAE30\uD654\uB428",timeUp:"\u26A0\uFE0F \uC218 \uB9C8\uC2EC \uC2DC\uAC04!",healthHigh:"\u26A0\uFE0F \uC624\uB298 {ml}ml\uB97C \uB9C8\uC168\uC2B5\uB2C8\uB2E4. \uB108\uBB34 \uB9CE\uC774 \uB9C8\uC2DC\uBA74 \uC800\uB098\uD2B8\uB9D8 \uC99D\uC774 \uC788\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",healthNear:"\uD83D\uDC4D \uAC70\uC758 \uB2E4\uB410\uC2B5\uB2C8\uB2E4! \uAC08\uC99D\uC5D0 \uB9C8\uC2DC\uBA74 \uB429\uB2C8\uB2E4.",settingsTitle:"\u2699\uFE0F \uC124\uC815",musicStyle:"음악 스타일",ms0:"부드러운",ms1:"경쾌한",ms2:"명상",ms3:"물소리",ms4:"노래",about:"출처 및 라이선스",aboutMusic:"🎵 음악: Web Audio API 실시간 합성(물방울 인트로 + 다양한 스타일) 및 사용자 제공 곡 music.mp3(개인용, 재배포 금지). 출처: 내장 신디사이저 / 사용자 제공 · 라이선스 ",aboutImage:"🖼️ 표지 사진: 물방울 물결 · 출처: 사용자 제공 · 개인 비상업적 용도로만 사용",cupOf:"{g}잔 중 {n}번째",snoozeBtn:"10분 후 알림",exportBtn:"달력 내보내기",icsTitle:"물 마시기 {g}잔 중 {n}번째",icsDesc:"물 한 잔({ml}ml) 마실 시간이에요",exported:"📅 water-reminder.ics 내보냈어요 — 달력 앱에 가져가세요",calTest:"달력 알림",testIcs:"테스트 알림(2분 후)",testExported:"테스트 일정을 내보냈어요(2분 후). 달력 알림을 확인하세요",calNote:"💡 달력 알림의 소리/진동은 휴대폰 시스템 설정의 달력 앱 알림에서 켜세요. 페이지를 열어두면 음악 알림이 작동해요",notifGrp:"시스템 알림",reqNotif:"알림 켜기",notifOn:"✅ 알림이 켜졌어요 — 백그라운드에서도 알려줘요",notifDeny:"권한이 거부되었어요. 브라우저 주소창 권한 설정에서 허용해 주세요",notifNoSvc:"이 환경은 알림을 지원하지 않아요 — Chrome/Edge로 열어 주세요",notifTest:"알림 준비 완료 💧",notifNote:"💡 알림을 켜면 최소화/백그라운드(PC)에서도 알림이 와요. 완전히 닫으면 달력이 필요해요",sync:"동기화",syncCopied:"🔗 설정 링크를 복사했어요! 휴대폰에서 열면 자동 적용돼요",syncApplied:"✅ 공유된 설정을 적용했어요",exactPerm:"⚠️ 시스템 설정에서 \"알람 및 알림\" 권한을 허용해 주세요",durGrp:"알림 길이",dur0:"10초",dur1:"20초",dur2:"30초",fullPlay:"전체 미리듣기(선택 길이)",fullPlayTip:"⏳ 현재 설정으로 전체 알림 재생 중; 음악 스타일 또는 일시정지를 누르면 멈춰요"},
+fr:{title:"Rappel d'hydratation",sub:"Restez hydrat\u00E9 · Restez en sant\u00E9",done:"Bu",goal:"Objectif",ml:"Bu(ml)",next:"Prochain",settings:"Param\u00E8tres",goalIn:"Objectif (verres)",cupMl:"Taille (ml)",start:"Heure d\u00E9but",end:"Heure fin",sched:"Planification",manual:"Manuel",auto:"Auto",freq:"Fr\u00E9quence (min)",redist:"Redistribuer",manualHint:"Ajoutez des moments ou utilisez l'auto",add:"Ajouter",startBtn:"D\u00E9marrer",pause:"Pause",reset:"R\u00E9initialiser",method:"M\u00E9thode",music:"Musique",vibrate:"Vibrer",silent:"Silencieux",lang:"Langue",close:"OK",drinkBtn:"Bu",undo:"Annuler",goalDone:"\uD83C\uDF89 Objectif atteint !",reminderOn:"\u2705 Rappels activ\u00E9s",resetMsg:"\u21BB R\u00E9initialis\u00E9",timeUp:"\u26A0\uFE0F C'est l'heure de boire !",healthHigh:"\u26A0\uFE0F Vous avez bu {ml} ml aujourd'hui. Trop d'eau en peu de temps peut causer une hyponatr\u00E9mie. \u00C9coutez votre corps.",healthNear:"\uD83D\uDC4D Presque l\u00E0 ! Buvez quand vous avez soif, pas besoin de forcer.",settingsTitle:"\u2699\uFE0F Param\u00E8tres",musicStyle:"Style musical",ms0:"Doux",ms1:"Vif",ms2:"Méditation",ms3:"Ruisseau",ms4:"Chanson",about:"Sources et licences",aboutMusic:"🎵 Musique : synthèse Web Audio temps réel (intro goutte d'eau + mélodies variées) ; plus le morceau fourni music.mp3 (usage personnel uniquement, ne pas redistribuer). Source : moteur intégré / fourni par l'utilisateur · Licence : ",aboutImage:"🖼️ Photo de couverture : goutte d'eau et ondulations · Source : fournie par l'utilisateur · usage personnel non commercial uniquement",cupOf:"Verre {n} sur {g}",snoozeBtn:"Plus tard (10 min)",exportBtn:"Exporter .ics",icsTitle:"Rappel hydratation {n}/{g}",icsDesc:"C'est l'heure de boire un verre ({ml} ml)",exported:"📅 water-reminder.ics exporté — importez-le dans votre app calendrier",calTest:"Alertes calendrier",testIcs:"Test (dans 2 min)",testExported:"Événement test exporté (dans 2 min). Importez-le pour vérifier les notifications",calNote:"💡 Activez son/vibration de l'app Calendrier dans les notifications système. Gardez la page ouverte pour la musique",notifGrp:"Notifications système",reqNotif:"Activer les notifications",notifOn:"✅ Notifications activées — alertes même en arrière-plan",notifDeny:"Permission refusée. Autorisez les notifications depuis la barre d'adresse",notifNoSvc:"Notifications non prises en charge ici — ouvrez avec Chrome/Edge",notifTest:"Notifications prêtes 💧",notifNote:"💡 Une fois activées, les fenêtres réduites/arrière-plan (PC) reçoivent des alertes. Page fermée = calendrier requis",sync:"Synchroniser",syncCopied:"🔗 Lien de config copié ! Ouvrez-le sur votre téléphone pour l'appliquer",syncApplied:"✅ Config partagée appliquée",exactPerm:"⚠️ Autorisez \"Alarmes et rappels\" dans les paramètres système",durGrp:"Durée du rappel",dur0:"10s",dur1:"20s",dur2:"30s",fullPlay:"Aperçu complet (durée choisie)",fullPlayTip:"⏳ Lecture complète selon vos réglages ; cliquez un style ou Pause pour arrêter"}
 };
 var lang="zh", method=0;
 function savePrefs(){try{localStorage.setItem("waterPrefs",JSON.stringify({lang:lang,method:method,style:musicStyle,rd:remindSec}))}catch(x){}}
@@ -320,26 +406,25 @@ ko:["천천히 마셔요, 몸이 고마워하고 있어요 💙","수분이 가�
 fr:["Buvez lentement, votre corps vous remercie 💙","Un cerveau hydraté, un esprit clair !","Étirez-vous un peu après ce verre ✨","Bonne habitude, vos reins sourient 😊","Votre peau et votre cerveau adorent 💧","Hydraté pour un après-midi au top 🌤"]};
 function pickTip(){var a=TIPS[lang]||TIPS.zh;return a[Math.floor(Math.random()*a.length)]}
 function applyLang(){var L=I18N[lang];
-$("t_title").innerHTML="\uD83D\uDCA7 "+(lang==="zh"?"喝水提醒":lang==="en"?"Water Reminder":lang==="ko"?"물 마시기 알림":"Rappel d'hydratation");
+$("t_titleTxt").textContent=L.title;
 $("t_sub").textContent=L.sub;$("l_done").textContent=L.done;$("l_goal").textContent=L.goal;
-$("l_ml").textContent=L.ml;$("l_next").textContent=L.next;$("t_settings").innerHTML="\u2699\uFE0F "+L.settings;
+$("l_ml").textContent=L.ml;$("l_next").textContent=L.next;$("t_settings").textContent=L.settings;
 $("l_goalIn").textContent=L.goalIn;$("l_cupMl").textContent=L.cupMl;
-$("l_start").textContent=L.start;$("l_end").textContent=L.end;$("t_sched").innerHTML="\u23F0 "+L.sched;
+$("l_start").textContent=L.start;$("l_end").textContent=L.end;$("t_sched").textContent=L.sched;
 $("tabM").textContent=L.manual;$("tabA").textContent=L.auto;$("l_freq").textContent=L.freq;
 $("l_redist").textContent=L.redist;$("l_manualHint").textContent=L.manualHint;
 $("l_add").textContent=L.add;$("l_startBtn").textContent=L.startBtn;$("l_pause").textContent=L.pause;$("l_reset").textContent=L.reset;$("l_export").textContent=L.exportBtn;$("l_sync").textContent=L.sync;
-$("t_settingsTitle").innerHTML="\u2699\uFE0F "+L.settings;$("l_method").innerHTML="\uD83D\uDD0A "+L.method;
-$("mMusic").innerHTML="\uD83C\uDFB5 "+L.music;$("mVibrate").innerHTML="\uD83D\uDCF3 "+L.vibrate;$("mSilent").innerHTML="\uD83D\uDD07 "+L.silent;
-$("l_lang").innerHTML="\uD83C\uDF10 "+L.lang;$("l_close").textContent=L.close;
-$("l_musicStyle").innerHTML="\uD83C\uDFB5 "+L.musicStyle;
-var msp=["\uD83D\uDCA7","\u2728","\uD83E\uDDD8","\uD83C\uDF0A","\uD83C\uDFB5"];
-for(var mi=0;mi<5;mi++)$("msB"+mi).textContent=msp[mi]+" "+L["ms"+mi];
-$("t_about").innerHTML="\u2139\uFE0F "+L.about;
+$("t_settingsTitle").textContent=L.settings;$("l_method").textContent=L.method;
+$("mMusic").querySelector("span").textContent=L.music;$("mVibrate").querySelector("span").textContent=L.vibrate;$("mSilent").querySelector("span").textContent=L.silent;
+$("l_lang").textContent=L.lang;$("l_close").textContent=L.close;
+$("l_musicStyle").textContent=L.musicStyle;
+for(var mi=0;mi<5;mi++)$("msB"+mi).textContent=L["ms"+mi];
+$("t_about").textContent=L.about;
 $("aMusic").innerHTML=L.aboutMusic+'<a href="https://creativecommons.org/publicdomain/zero/1.0/deed.zh" target="_blank" rel="noopener">CC0 1.0 ↗</a>'+(lang==="en"||lang==="fr"?' <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">(EN)</a>':"");
 $("aImg").textContent=L.aboutImage;
-$("l_calTest").innerHTML="\uD83D\uDCC5 "+L.calTest;$("l_testIcs").textContent=L.testIcs;$("l_calNote").textContent=L.calNote;
-$("l_notifGrp").innerHTML="\uD83D\uDD14 "+L.notifGrp;$("l_notifNote").textContent=L.notifNote;updateNotifUI();
-$("l_durGrp").innerHTML="\u23F1 "+L.durGrp;var durv=[L.dur0,L.dur1,L.dur2];for(var di=0;di<3;di++)$("durB"+di).textContent=durv[di];$("l_fullPlay").textContent=L.fullPlay;
+$("l_calTest").textContent=L.calTest;$("l_testIcs").textContent=L.testIcs;$("l_calNote").textContent=L.calNote;
+$("l_notifGrp").textContent=L.notifGrp;$("l_notifNote").textContent=L.notifNote;updateNotifUI();
+$("l_durGrp").textContent=L.durGrp;var durv=[L.dur0,L.dur1,L.dur2];for(var di=0;di<3;di++)$("durB"+di).textContent=durv[di];$("l_fullPlay").textContent=L.fullPlay;
 renderSchedule()}
 function setLang(l){lang=l;applyLang();savePrefs();
 ["lgZh","lgEn","lgKo","lgFr"].forEach(function(id){$(id).classList.remove("on")});
@@ -382,12 +467,12 @@ function addSlot(){
 var modal=document.createElement('div');
 modal.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center';
 var box=document.createElement('div');
-box.style.cssText='background:rgba(255,255,255,.82);backdrop-filter:blur(14px);border-radius:18px;padding:22px;max-width:320px;width:88%;box-shadow:0 12px 40px rgba(0,0,0,.2)';
-box.innerHTML='<div style="font-size:.9em;font-weight:600;color:#01579b;margin-bottom:12px;text-align:center">&#x23F1; &#x9009;&#x62E9;&#x65F6;&#x95F4;</div>';
+box.style.cssText='background:var(--card);backdrop-filter:blur(18px);border-radius:16px;padding:22px;max-width:320px;width:88%;box-shadow:var(--shadow);color:var(--ink)';
+box.innerHTML='<div style="font-size:.9em;font-weight:600;margin-bottom:12px;text-align:center">&#x23F1; &#x9009;&#x62E9;&#x65F6;&#x95F4;</div>';
 var now=new Date();
 var inp=document.createElement('input');inp.type='time';inp.step=1;inp.id='tp_time';
 inp.value=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0")+":00";
-inp.style.cssText='width:100%;padding:10px;border:2px solid #b3e5fc;border-radius:12px;text-align:center;font-size:1.15em;color:#01579b;background:#fff';
+inp.style.cssText='width:100%;padding:10px;border:1.5px solid var(--card-line);border-radius:9px;text-align:center;font-size:1.15em;color:var(--ink);background:var(--field);font-variant-numeric:tabular-nums';
 box.appendChild(inp);
 var btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:8px;margin-top:14px';
 var okBtn=document.createElement('button');okBtn.textContent='OK';okBtn.style.cssText='flex:1;padding:10px;border:none;border-radius:12px;background:#0288d1;color:#fff;font-weight:600;cursor:pointer';
@@ -409,8 +494,8 @@ pendingZi=i;var ml=+$("cupMl").value||250;
 $("dmTitle").textContent=t("timeUp");
 $("dmCup").textContent=t("cupOf").replace("{n}",i+1).replace("{g}",slots.length);
 $("dmMl").textContent=ml+" ml";
-$("dmSip").textContent="💧 "+t("drinkBtn");
-$("dmSnooze").textContent="⏰ "+t("snoozeBtn");
+$("dmSip").textContent=t("drinkBtn");
+$("dmSnooze").textContent=t("snoozeBtn");
 $("nextTime").textContent="--:--";
 $("drinkModal").classList.add("show");
 sysNotify(t("timeUp"),t("cupOf").replace("{n}",i+1).replace("{g}",slots.length)+" \u00B7 "+ml+" ml")}
@@ -450,8 +535,8 @@ d.innerHTML='<span class="st-t">'+slots[i]+'</span><span class="st-a">'+(+$("cup
 function updateDisplay(){var g=slots.length,d=done.filter(Boolean).length,ml=(+$("cupMl").value||250)*d;
 $("goalNum").textContent=g;$("doneNum").textContent=d;$("mlNum").textContent=ml;
 var p=g?Math.min(100,Math.round(d/g*100)):0;$("pctLabel").textContent=p+"%";$("waterBody").style.height=p+"%"}
-function startReminders(){running=true;scheduleNext();toast(t("reminderOn"),"i")}
-function stopReminders(){running=false;clearTimeout(timer);stopChime();pendingZi=-1;$("drinkModal").classList.remove("show");$("nextTime").textContent="--:--"}
+function startReminders(){running=true;scheduleNext();nativeSetup();if(document.hidden)nativeAlarm("set");toast(t("reminderOn"),"i")}
+function stopReminders(){running=false;clearTimeout(timer);stopChime();nativeAlarm("cancel");pendingZi=-1;$("drinkModal").classList.remove("show");$("nextTime").textContent="--:--"}
 function slotInRange(ts){var s=toSec($("startT").value),e=toSec($("endT").value);if(s<=e)return ts>=s&&ts<=e;return ts>=s||ts<=e}
 function inRange(){
 var s=toSec($("startT").value),e=toSec($("endT").value);
