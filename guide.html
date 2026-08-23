@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>喝水提醒 · 使用说明书</title>
+<style>
+:root{--p:#0284c7;--ink:#0f2a3d;--ink2:#33607a;--ink3:#557a93;--bg:#f0f9ff;--card:#fff;--line:#e0f0f8}
+@media(prefers-color-scheme:dark){:root{--p:#38bdf8;--ink:#e3f4fd;--ink2:#a8cfe3;--ink3:#7fa8bf;--bg:#06202f;--card:#0c2d40;--line:#164a63}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#bfe5f7,#6db8dd);color:var(--ink);min-height:100vh;padding:24px 14px;line-height:1.75}
+@media(prefers-color-scheme:dark){body{background:linear-gradient(180deg,#03192a,#062d44)}}
+.wrap{max-width:720px;margin:auto}
+.card{background:var(--card);border-radius:16px;padding:28px 26px;margin-bottom:18px;box-shadow:0 12px 40px rgba(8,47,73,.18)}
+h1{font-size:1.5rem;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+h1 svg{width:26px;height:26px;stroke:var(--p);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sub{color:var(--ink2);font-size:.9rem;margin-bottom:8px}
+h2{font-size:1.05rem;margin:0 0 10px;color:var(--p)}
+h3{font-size:.92rem;margin:14px 0 6px;color:var(--ink)}
+p,li{font-size:.92rem;color:var(--ink2)}
+ol,ul{padding-left:22px;margin:6px 0}
+li{margin:4px 0}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.86rem}
+th{background:rgba(2,132,199,.1);color:var(--ink);text-align:left;padding:8px 10px}
+td{border-bottom:1px solid var(--line);padding:8px 10px;color:var(--ink2)}
+.tag{display:inline-block;background:rgba(2,132,199,.12);color:var(--p);border-radius:99px;padding:2px 10px;font-size:.75rem;font-weight:600;margin:2px 4px 2px 0}
+code{background:rgba(2,132,199,.1);color:var(--p);border-radius:5px;padding:1px 7px;font-size:.85em}
+.tip{background:rgba(21,128,61,.1);border-radius:10px;padding:10px 14px;font-size:.85rem;color:#15803d;margin:10px 0}
+@media(prefers-color-scheme:dark){.tip{color:#4ade80}}
+.warn{background:rgba(180,83,9,.12);border-radius:10px;padding:10px 14px;font-size:.85rem;color:#b45309;margin:10px 0}
+@media(prefers-color-scheme:dark){.warn{color:#fbbf24}}
+a{color:var(--p)}
+.qa{border-bottom:1px solid var(--line);padding:10px 2px}
+.qa b{color:var(--ink);font-size:.92rem}
+.foot{text-align:center;color:var(--ink3);font-size:.78rem;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="card">
+<h1><svg viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>喝水提醒 · 使用说明书</h1>
+<p class="sub">水滴涟漪封面 · 多风格音乐 · 弹窗打卡 · 息屏闹钟提醒</p>
+<p>官网：<a href="https://hela612.github.io/water-reminder/">hela612.github.io/water-reminder</a> ｜ 安卓 App：<a href="https://hela612.github.io/water-reminder/water-reminder.apk">点此下载 apk</a></p>
+</div>
+
+<div class="card">
+<h2>⚡ 快速上手（30 秒）</h2>
+<ol>
+<li>打开应用（默认时间表：每天 8 杯，08:00–20:15 自动均分）</li>
+<li>点 <b>▶ 开始</b>，允许弹出的权限（通知 + 闹钟和提醒）</li>
+<li>完成。到点弹窗打卡“💧 喝了”即可；想改时间点去“时间安排”随意加减</li>
+</ol>
+<div class="tip">最小操作就是这两步——时间表不设置也有默认方案，但必须点一次“开始”才会提醒。</div>
+</div>
+
+<div class="card">
+<h2>📱 三个版本怎么选</h2>
+<table>
+<tr><th>版本</th><th>怎么用</th><th>能做什么</th></tr>
+<tr><td><b>安卓 App</b>（推荐）</td><td>下载 apk 安装</td><td>前台：音乐+弹窗打卡；<b>息屏/杀后台：系统闹钟级响铃+震动</b>（放你喜欢的歌）</td></tr>
+<tr><td><b>网页/PWA</b></td><td>浏览器打开官网，可“添加到主屏幕”</td><td>全功能体验；电脑最小化也弹系统通知；手机息屏不提醒</td></tr>
+<tr><td><b>日历兜底</b></td><td>页面点“📅 导出日历”→ 导入手机日历</td><td>任何设备息屏都准时提醒（日历铃声）；和 App 双保险</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>🔧 核心功能</h2>
+<h3>时间表</h3>
+<ul>
+<li><span class="tag">每日循环</span>每天重复同一时间表（默认）；<span class="tag">指定日期</span>只提醒某一天</li>
+<li><span class="tag">均分</span>按开始/结束时间自动分配；<span class="tag">自定义</span>用“＋ 添加”逐个加（手机上是滚轮时间选择器）</li>
+<li>新加的时间点自动按时间排序，“第几杯”永远和时间顺序一致</li>
+</ul>
+<h3>到点提醒</h3>
+<ul>
+<li>弹窗显示<b>第几杯 / 共几杯 / 多少毫升</b>，配水滴声开场的音乐</li>
+<li>点 <b>💧 喝了</b>：立即静音、记录进度、送一条健康小贴士</li>
+<li>点 <b>稍后 10 分钟</b>：这杯顺延 10 分钟再提醒</li>
+<li>音乐风格 5 种：<b>轻柔 / 活泼 / 冥想 / 流水 / 歌曲</b>（歌曲为你导入的 MP3）；提醒时长 <b>10 / 20 / 30 秒</b>可选；“▶ 完整试听”按所选时长真实播放验证</li>
+</ul>
+<h3>🔗 同步</h3>
+<p>点“同步”把当前全部设置打包成链接并复制——发到手机/电脑打开即自动套用，免重复设置。</p>
+<h3>📅 导出日历</h3>
+<p>生成 <code>.ics</code> 文件导入系统日历，获得<b>息屏也准时</b>的系统提醒（与 App 互为双保险）。日历提醒的声音/震动在手机系统设置的“日历”App 通知里开启。可用设置里的“🧪 测试提醒”验证链路。</p>
+<h3>🔔 系统通知（网页版）</h3>
+<p>设置里开启后，电脑上页面最小化/后台也会弹系统通知；App 内置更强调铃，无需此项。</p>
+</div>
+
+<div class="card">
+<h2>🔐 安卓权限设置（息屏提醒的关键）</h2>
+<h3>必开两项</h3>
+<ol>
+<li><b>通知权限</b>：点“▶ 开始”时自动弹出，允许即可</li>
+<li><b>闹钟和提醒</b>：点开始会自动跳到系统页——<b>把开关打开</b>（没开的话提醒时间可能偏差几分钟，App 会提示）</li>
+</ol>
+<h3>各品牌“后台白名单”（防系统杀后台）</h3>
+<ul>
+<li><b>小米/红米</b>：设置 → 应用设置 → 应用管理 → 喝水提醒 → 省电策略 → <b>无限制</b></li>
+<li><b>华为/荣耀</b>：设置 → 电池 → 应用启动管理 → 喝水提醒 → 手动管理，三个开关全开</li>
+<li><b>OPPO/vivo</b>：设置 → 电池 → 允许完全后台行为 / 加入省电白名单</li>
+</ul>
+<div class="warn">国产手机不放开这一项，任何 App 的后台提醒都可能被系统掐掉——这是系统层限制，不是应用问题。</div>
+</div>
+
+<div class="card">
+<h2>💻 电脑 / 🍎 iPhone</h2>
+<ul>
+<li><b>电脑</b>：Chrome/Edge 打开官网 → 地址栏“安装”变桌面 App；设置里开“系统通知”后最小化也能弹通知</li>
+<li><b>iPhone</b>：Safari 打开官网 → 分享 → 添加到主屏幕（iOS 16.4+ 支持通知）；息屏提醒建议配合“导出日历”</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>❓ 常见问题</h2>
+<div class="qa"><b>Q：点“开始”了但后台不响？</b><br>按“安卓权限设置”检查三项：闹钟和提醒权限、通知权限、后台白名单。改完把 App 划掉重开、重新点一次“▶ 开始”。</div>
+<div class="qa"><b>Q：打开是旧版本？</b><br>网页：刷新两次；App：重新下载 apk 覆盖安装。</div>
+<div class="qa"><b>Q：提醒声音太小？</b><br>App 响铃走系统“闹钟音量”通道——手机设置 → 声音 → 把闹钟音量调大。</div>
+<div class="qa"><b>Q：日历导入了没声音？</b><br>手机设置 → 应用 → 日历 → 通知：开启并选铃声+震动。</div>
+<div class="qa"><b>Q：点了“喝了”还响？</b><br>已修复：点“喝了”会同时停网页音乐和 App 原生响铃，并把这杯从后续闹钟中移除。若仍出现请更新到最新 apk。</div>
+<div class="qa"><b>Q：改了设置要重新点开始吗？</b><br>不用。运行中改时间表/打卡会自动同步到原生闹钟；只有点“⏸ 暂停”后需要重新点“▶ 开始”。</div>
+</div>
+
+<div class="card">
+<h2>📜 版权与许可</h2>
+<p>合成音乐：Web Audio API 实时程序合成（<a href="https://creativecommons.org/publicdomain/zero/1.0/deed.zh" target="_blank" rel="noopener">CC0 1.0</a>，可自由分享）；歌曲 music.mp3 与封面照片由用户提供，<b>仅供个人使用，请勿二次分发</b>。</p>
+<p class="foot">喝水提醒 v1.0 · 水是生命之源，小口慢饮 💧</p>
+</div>
+
+</div>
+</body>
+</html>

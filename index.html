@@ -193,7 +193,8 @@ h1 .ic{width:1.15em;height:1.15em;color:var(--primary)}
 <div class="about">
 <div class="st" id="t_about">来源与许可</div>
 <div id="aMusic" style="margin-bottom:4px"></div>
-<div id="aImg"></div>
+<div id="aImg" style="margin-bottom:6px"></div>
+<div><a href="guide.html" target="_blank" rel="noopener" id="l_guide">📖 使用说明书</a></div>
 </div>
 </div>
 
@@ -344,8 +345,11 @@ for(var i=0;i<slots.length;i++){if(!done[i])t.push(slots[i])}
 W.setAlarms({times:t,ringSec:remindSec,daily:dateMode===0}).then(function(r){
 if(r&&r.exact===false)toast(t("exactDegraded"),"w",8000);
 },function(){});
-}else{W.cancelAlarms({})}
+}else if(op==="stopring"){W.stopRinging({})}
+else{W.cancelAlarms({})}
 }catch(x){}}
+/* 任何打卡/时间表变化后立即重排原生闹钟（已喝的杯不再响） */
+function syncNative(){if(running)nativeAlarm("set")}
 function nativeSetup(){
 try{
 var cap=window.Capacitor;
@@ -510,7 +514,7 @@ if(zi>=0&&!done[zi]){var d=new Date(Date.now()+600000);
 slots[zi]=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
 renderSchedule();updateDisplay()}
 if(running)scheduleNext()}
-function drink(i){if(done[i])return;stopChime();if(pendingZi===i){pendingZi=-1;$("drinkModal").classList.remove("show")}done[i]=true;renderSchedule();updateDisplay();checkHealth();if(done.filter(Boolean).length>=slots.length){toast(t("goalDone"),"d");stopReminders()}}
+function drink(i){if(done[i])return;stopChime();nativeAlarm("stopring");if(pendingZi===i){pendingZi=-1;$("drinkModal").classList.remove("show")}done[i]=true;renderSchedule();updateDisplay();checkHealth();if(done.filter(Boolean).length>=slots.length){toast(t("goalDone"),"d");stopReminders()}}
 function undrink(i){done[i]=false;renderSchedule();updateDisplay()}
 function checkHealth(){
 var d=done.filter(Boolean).length,ml=d*(+$("cupMl").value||250),g=slots.length,totalMl=g*(+$("cupMl").value||250);
@@ -532,7 +536,8 @@ function renderSchedule(){var list=$("schedList");list.innerHTML="";
 for(var i=0;i<slots.length;i++){var d=document.createElement("div");d.className="si"+(done[i]?" done":"");
 d.innerHTML='<span class="st-t">'+slots[i]+'</span><span class="st-a">'+(+$("cupMl").value||250)+' ml</span>'+
 (done[i]?'<button class="sb sb-u" onclick="undrink('+i+')">'+t("undo")+'</button>':'<button class="sb sb-d" onclick="drink('+i+')">'+t("drinkBtn")+'</button>')+
-'<button class="sb sb-u" onclick="removeSlot('+i+')">\u00D7</button>';list.appendChild(d)}}
+'<button class="sb sb-u" onclick="removeSlot('+i+')">\u00D7</button>';list.appendChild(d)}
+syncNative()}
 function updateDisplay(){var g=slots.length,d=done.filter(Boolean).length,ml=(+$("cupMl").value||250)*d;
 $("goalNum").textContent=g;$("doneNum").textContent=d;$("mlNum").textContent=ml;
 var p=g?Math.min(100,Math.round(d/g*100)):0;$("pctLabel").textContent=p+"%";$("waterBody").style.height=p+"%"}
